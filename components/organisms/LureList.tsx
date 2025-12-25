@@ -19,12 +19,6 @@ export default function LureList({ lures, total }: LureListProps) {
 
   return (
     <section className="flex flex-col gap-2">
-      {total && (
-        <div className="text-text-secondary text-sm mb-1">
-          全{total}件
-        </div>
-      )}
-
       {lures.map((lure, index) => (
         <LureCard key={lure.id} lure={lure} priority={index < 2} />
       ))}

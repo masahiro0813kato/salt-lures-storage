@@ -1,6 +1,6 @@
-import { Suspense } from "react";
 import Header from "@/components/organisms/Header";
 import SearchBar from "@/components/organisms/SearchBar";
+import StickyHeader, { StickyHeaderProvider } from "@/components/organisms/StickyHeader";
 import LureList from "@/components/organisms/LureList";
 import ScrollToTop from "@/components/organisms/ScrollToTop";
 import { createClient } from "@/lib/supabase/server";
@@ -79,11 +79,18 @@ export default async function LuresPage({
   }
 
   return (
-    <>
-      <Header />
-
-      <main className="mt-16">
+    <StickyHeaderProvider>
+      <StickyHeader>
+        <Header />
         <SearchBar latestSearchKey={search} />
+        {count !== null && count > 0 && (
+          <div className="px-4 pb-2">
+            <div className="text-text-secondary text-sm">全{count}件</div>
+          </div>
+        )}
+      </StickyHeader>
+
+      <main className="pt-[200px]">
         <div className="px-4">
           <LureList
             lures={(lures as LureWithRelations[]) || []}
@@ -93,7 +100,7 @@ export default async function LuresPage({
       </main>
 
       <ScrollToTop />
-    </>
+    </StickyHeaderProvider>
   );
 }
 

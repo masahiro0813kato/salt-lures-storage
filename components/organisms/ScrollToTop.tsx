@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useStickyHeader } from './StickyHeader';
 
 export default function ScrollToTop() {
   const [buttonActive, setButtonActive] = useState(false);
+  const { isForceVisible, toggleVisibility } = useStickyHeader();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,18 +19,15 @@ export default function ScrollToTop() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const pageTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+  const handleClick = () => {
+    toggleVisibility();
   };
 
   if (!buttonActive) return null;
 
   return (
     <div
-      onClick={pageTop}
+      onClick={handleClick}
       className="fixed bottom-4 right-2 w-12 h-12 bg-accent-green rounded-full
                  flex items-center justify-center cursor-pointer
                  shadow-[0_8px_16px_rgba(0,0,0,0.5)]
@@ -42,7 +41,7 @@ export default function ScrollToTop() {
     >
       <Image
         src="/images/common/icon-search.svg"
-        alt="トップへ戻る"
+        alt={isForceVisible ? "ヘッダーを隠す" : "ヘッダーを表示"}
         width={24}
         height={24}
         className="opacity-0"

@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export default function Header() {
   return (
-    <header className="fixed top-0 w-full p-4 z-[1000] mix-blend-difference">
+    <header className="w-full p-4 mix-blend-difference">
       <div className="logo">
         <Link href="/lures">
           <Image
