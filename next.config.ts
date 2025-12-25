@@ -1,0 +1,26 @@
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  images: {
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    minimumCacheTTL: 60 * 60 * 24 * 365,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'acnvuvzuswsyrbczxzko.supabase.co',
+        pathname: '/storage/v1/object/public/lure-images/**',
+      },
+    ],
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
+  turbopack: {},
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  compress: true,
+};
+
+export default nextConfig;
