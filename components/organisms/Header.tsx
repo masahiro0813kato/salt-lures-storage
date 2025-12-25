@@ -1,9 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function Header() {
+interface HeaderProps {
+  fixed?: boolean;
+}
+
+export default function Header({ fixed = false }: HeaderProps) {
   return (
-    <header className="w-full p-4 mix-blend-difference">
+    <header className={`${fixed ? 'fixed' : ''} top-0 left-0 w-full p-4 mix-blend-difference z-[100]`}>
       <div className="logo">
         <Link href="/lures">
           <Image

@@ -14,8 +14,10 @@
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.81.1",
+    "@types/three": "^0.182.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "color-thief-browser": "^2.0.2",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.553.0",
     "next": "^15.1.0",
@@ -24,6 +26,7 @@
     "swr": "^2.3.6",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.182.0",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

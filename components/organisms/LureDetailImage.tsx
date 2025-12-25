@@ -1,34 +1,29 @@
 "use client";
 
 import Image from "next/image";
+import LureDetailBackground from "./LureDetailBackground";
 
 interface LureDetailImageProps {
   lureId: number;
   lureName: string;
+  showDebugUI?: boolean;
 }
 
 export default function LureDetailImage({
   lureId,
   lureName,
+  showDebugUI = false,
 }: LureDetailImageProps) {
-  return (
-    <section className="relative w-full flex justify-center bg-white">
-      {/* ぼかし背景 */}
-      <div className="absolute inset-0 z-[1] backdrop-blur-[30px]" />
+  const imageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/lure_${lureId}.png`;
 
-      {/* 背景ズームアニメーション */}
-      <div
-        className="absolute inset-0 z-[1] opacity-35 brightness-[130%] saturate-[400%] animate-zoom"
-        style={{
-          backgroundColor: "#fff",
-          backgroundImage: `url(https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/lure_${lureId}.png)`,
-          backgroundRepeat: "no-repeat",
-        }}
-      />
+  return (
+    <section className="relative w-full flex justify-center overflow-hidden">
+      {/* 背景（Canvas） */}
+      <LureDetailBackground imageUrl={imageUrl} showDebugUI={showDebugUI} />
 
       {/* メイン画像 */}
       <Image
-        src={`https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/lure_${lureId}.png`}
+        src={imageUrl}
         alt={lureName}
         width={800}
         height={600}

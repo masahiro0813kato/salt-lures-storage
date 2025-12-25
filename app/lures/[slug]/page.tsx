@@ -104,11 +104,11 @@ export default async function LureDetailPage({
   }
 
   return (
-    <>
-      <Header />
-      <main>
+    <div className="bg-white min-h-screen">
+      <Header fixed={true} />
+      <main className="relative">
         {/* 画像セクション */}
-        <LureDetailImage lureId={lure.id} lureName={lure.lure_name_ja} />
+        <LureDetailImage lureId={lure.id} lureName={lure.lure_name_ja} showDebugUI={true} />
 
         {/* データセクション */}
         <section className="relative bg-bg-primary z-50 px-4 py-8 text-white">
@@ -227,7 +227,7 @@ export default async function LureDetailPage({
           />
         </section>
       </main>
-    </>
+    </div>
   );
 }
 
