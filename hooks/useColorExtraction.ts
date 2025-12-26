@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { isDefaultImage } from '@/constants/images';
 import { rgbToHsl, hslToRgb } from '@/lib/colorUtils';
 import { ColorExtractionParams } from '@/types/shader';
+import { colorCache } from '@/lib/colorCache';
 
 interface ExtractedColor {
   baseRgb: [number, number, number]; // 0-1 正規化
@@ -24,7 +25,8 @@ const DEFAULT_PARAMS: ColorExtractionParams = {
 
 export function useColorExtraction(
   imageUrl: string | null,
-  params: ColorExtractionParams = DEFAULT_PARAMS
+  params: ColorExtractionParams = DEFAULT_PARAMS,
+  weightMultipliers: [number, number, number, number] = [0.7, 1.5, 1.5, 0.7]
 ): UseColorExtractionResult {
   const [palette, setPalette] = useState<ExtractedColor[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +35,7 @@ export function useColorExtraction(
   useEffect(() => {
     // デフォルト画像チェック - 即座にnullを返す
     if (isDefaultImage(imageUrl)) {
+      console.log('⏭️ Skipping color extraction: default image');
       setPalette(null);
       setIsLoading(false);
       setError(null);
@@ -40,7 +43,20 @@ export function useColorExtraction(
     }
 
     if (!imageUrl) {
+      console.log('⏭️ Skipping color extraction: no image URL');
       setPalette(null);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
+    // キャッシュチェック
+    const cacheKey = `${imageUrl}_${params.minLightness}_${params.muddyThreshold}_${params.accentThreshold}`;
+    const cached = colorCache.get(cacheKey);
+
+    if (cached) {
+      console.log('✅ Using cached palette for:', imageUrl);
+      setPalette(cached);
       setIsLoading(false);
       setError(null);
       return;
@@ -54,14 +70,41 @@ export function useColorExtraction(
         // ColorThiefを動的インポート
         const ColorThief = (await import('color-thief-browser')).default;
 
-        // 画像読み込み
-        const img = new Image();
-        img.crossOrigin = 'Anonymous';
+        // プロキシAPI経由で画像を読み込み（CORS問題を回避）
+        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+        console.log('🔄 Loading image via proxy:', proxyUrl);
 
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        // 画像読み込み（失敗時はデフォルト画像にフォールバック）
         await new Promise<void>((resolve, reject) => {
-          img.onload = () => resolve();
-          img.onerror = () => reject(new Error('Failed to load image'));
-          img.src = imageUrl;
+          let attemptedFallback = false;
+
+          img.onload = () => {
+            console.log('✅ Image loaded successfully via proxy');
+            resolve();
+          };
+
+          img.onerror = async (e) => {
+            // まだフォールバックを試していない場合、デフォルト画像を試す
+            if (!attemptedFallback) {
+              attemptedFallback = true;
+              console.warn('⚠️ Original image failed, trying default image');
+
+              // デフォルト画像のパスを取得（絶対パスに変換）
+              const defaultImageUrl = `${window.location.origin}/images/common/lure_main_default.webp`;
+              img.src = defaultImageUrl;
+            } else {
+              // デフォルト画像も失敗した場合はエラー
+              console.error('❌ Both original and default image failed to load');
+              console.error('Original URL:', imageUrl);
+              console.error('Proxy URL:', proxyUrl);
+              reject(new Error(`Failed to load image: ${imageUrl}`));
+            }
+          };
+
+          img.src = proxyUrl;
         });
 
         // ColorThiefで20色抽出（テストコードと同じ）
@@ -191,8 +234,120 @@ export function useColorExtraction(
         // スコアでソート（降順）
         processed.sort((a, b) => b.score - a.score);
 
-        // 上位4色を取得
-        let final = processed.slice(0, 4);
+        // 色の多様性を確保しながら4色を選択
+        let final: ExtractedColor[] = [];
+        const minColorDistance = 0.15; // RGB空間での最小距離（0-1スケール）
+        const minHueDistance = 0.08; // 色相の最小距離（0-1スケール、0.08 ≈ 29度）
+
+        // 色同士の距離を計算する関数
+        const getColorDistance = (c1: ExtractedColor, c2: ExtractedColor): number => {
+          const [r1, g1, b1] = c1.baseRgb;
+          const [r2, g2, b2] = c2.baseRgb;
+          return Math.sqrt(
+            Math.pow(r1 - r2, 2) +
+            Math.pow(g1 - g2, 2) +
+            Math.pow(b1 - b2, 2)
+          );
+        };
+
+        // 色相の距離を計算（円環上の最短距離）
+        const getHueDistance = (h1: number, h2: number): number => {
+          const diff = Math.abs(h1 - h2);
+          return Math.min(diff, 1.0 - diff); // 0.0-0.5の範囲
+        };
+
+        // 色相が近い場合、より鮮やかで明るい色を優先
+        const isBetterColor = (candidate: ExtractedColor, existing: ExtractedColor): boolean => {
+          const candidateHsl = rgbToHsl(candidate.baseRgb[0], candidate.baseRgb[1], candidate.baseRgb[2]);
+          const existingHsl = rgbToHsl(existing.baseRgb[0], existing.baseRgb[1], existing.baseRgb[2]);
+
+          // 色相が近い場合（29度以内）
+          if (getHueDistance(candidateHsl.h, existingHsl.h) < minHueDistance) {
+            // 彩度優先、次に明度で判定
+            if (Math.abs(candidateHsl.s - existingHsl.s) > 0.05) {
+              return candidateHsl.s > existingHsl.s; // より鮮やか
+            }
+            return candidateHsl.l > existingHsl.l; // より明るい
+          }
+
+          return false; // 色相が離れている場合は置き換えない
+        };
+
+        // スコアが高い順に、既存の色と十分に離れている色だけを追加
+        for (const candidate of processed) {
+          if (final.length >= 4) break;
+
+          // 同一色チェック（完全一致）
+          const isDuplicate = final.some(existing =>
+            existing.baseRgb[0] === candidate.baseRgb[0] &&
+            existing.baseRgb[1] === candidate.baseRgb[1] &&
+            existing.baseRgb[2] === candidate.baseRgb[2]
+          );
+
+          if (isDuplicate) continue;
+
+          // 既存の色との距離チェック
+          let shouldAdd = true;
+          let replaceIndex = -1;
+
+          for (let i = 0; i < final.length; i++) {
+            const existing = final[i];
+            const distance = getColorDistance(existing, candidate);
+
+            if (distance < minColorDistance) {
+              // 色相が近く、候補の方が優れている場合は置き換え
+              if (isBetterColor(candidate, existing)) {
+                replaceIndex = i;
+                break;
+              } else {
+                shouldAdd = false;
+                break;
+              }
+            }
+          }
+
+          if (replaceIndex >= 0) {
+            // より良い色で置き換え
+            final[replaceIndex] = candidate;
+          } else if (shouldAdd) {
+            final.push(candidate);
+          }
+        }
+
+        // 4色に満たない場合のみ白で埋める（距離チェックを緩和しても足りない場合）
+        if (final.length < 4) {
+          // より緩い距離制限で再試行
+          const relaxedMinDistance = 0.08;
+          for (const candidate of processed) {
+            if (final.length >= 4) break;
+
+            const isDuplicate = final.some(existing =>
+              existing.baseRgb[0] === candidate.baseRgb[0] &&
+              existing.baseRgb[1] === candidate.baseRgb[1] &&
+              existing.baseRgb[2] === candidate.baseRgb[2]
+            );
+
+            if (isDuplicate) continue;
+
+            const isTooClose = final.some(existing =>
+              getColorDistance(existing, candidate) < relaxedMinDistance
+            );
+
+            if (!isTooClose && !final.includes(candidate)) {
+              final.push(candidate);
+            }
+          }
+        }
+
+        // それでも足りない場合は白で埋める
+        while (final.length < 4) {
+          final.push({
+            baseRgb: [1.0, 1.0, 1.0],
+            weight: 0.05,
+            score: -1,
+            isNeutral: true,
+          });
+        }
 
         // 明度順に並び替え（明るい→暗い）
         final.sort((a, b) => {
@@ -200,6 +355,13 @@ export function useColorExtraction(
           const lB = rgbToHsl(b.baseRgb[0], b.baseRgb[1], b.baseRgb[2]).l;
           return lB - lA; // 降順（明るい→暗い）
         });
+
+        // 重みを調整して2番目、3番目の色を強調
+        // インデックス0: 1番目（明るい）、1: 2番目、2: 3番目、3: 4番目（暗い）
+        final = final.map((c, i) => ({
+          ...c,
+          weight: c.weight * weightMultipliers[i],
+        }));
 
         // 重みを正規化（合計1.0になるように）
         const totalWeight = final.reduce((sum, c) => sum + c.weight, 0);
@@ -217,6 +379,10 @@ export function useColorExtraction(
         }
 
         setPalette(final);
+
+        // 結果をキャッシュに保存
+        colorCache.set(cacheKey, final);
+        console.log('💾 Cached palette for:', imageUrl);
       } catch (err) {
         console.error('Color extraction failed:', err);
         setError(err instanceof Error ? err : new Error('Unknown error'));
@@ -227,7 +393,7 @@ export function useColorExtraction(
     };
 
     extractColors();
-  }, [imageUrl, params.minLightness, params.muddyThreshold, params.accentThreshold]);
+  }, [imageUrl, params.minLightness, params.muddyThreshold, params.accentThreshold, weightMultipliers]);
 
   return { palette, isLoading, error };
 }

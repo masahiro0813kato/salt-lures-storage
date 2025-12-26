@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { vertexShader, fragmentShader } from '@/shaders/liquidGradient/shaders';
 import { ShaderUniforms } from '@/types/shader';
@@ -41,6 +41,35 @@ export function useThreeBackground({
   const cameraRef = useRef<THREE.OrthographicCamera | null>(null);
   const uniformsRef = useRef<ShaderUniforms | null>(null);
   const animationIdRef = useRef<number | null>(null);
+
+  // 可視状態の追跡
+  const [isVisible, setIsVisible] = useState(true);
+  const isVisibleRef = useRef(true);
+
+  // IntersectionObserver でキャンバスの可視性を監視
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry.isIntersecting;
+        setIsVisible(visible);
+        isVisibleRef.current = visible;
+
+        console.log('Canvas visibility:', visible ? 'visible 👁️' : 'hidden 🙈');
+      },
+      {
+        threshold: 0, // 1pxでも見えたら可視とみなす
+        rootMargin: '50px', // 50px手前から準備開始（スムーズな表示）
+      }
+    );
+
+    observer.observe(canvasRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Three.js初期化
   useEffect(() => {
@@ -132,17 +161,22 @@ export function useThreeBackground({
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    // アニメーションループ（テストコード完全再現）
+    // アニメーションループ（可視性を考慮）
     const clock = new THREE.Clock();
     let accumulatedTime = 0;
     const animate = () => {
       if (!uniformsRef.current) return;
 
-      accumulatedTime += clock.getDelta() * 0.153; // speed: 0.153
+      // 可視時のみ時間を進める
+      if (isVisibleRef.current) {
+        accumulatedTime += clock.getDelta() * 0.153; // speed: 0.153
+        uniformsRef.current.uTime.value = accumulatedTime;
+        renderer.render(scene, camera);
+      } else {
+        // 非可視時はclockをリセットして時間の経過を無視
+        clock.getDelta();
+      }
 
-      uniformsRef.current.uTime.value = accumulatedTime;
-
-      renderer.render(scene, camera);
       animationIdRef.current = requestAnimationFrame(animate);
     };
 

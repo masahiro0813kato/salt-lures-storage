@@ -19,8 +19,19 @@ export default function LureDetailBackground({
 }: LureDetailBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const { palette, isLoading, error } = useColorExtraction(imageUrl);
   const [debugParams, setDebugParams] = useState<ShaderDebugParams | undefined>(undefined);
+
+  // ウェイト倍率を計算
+  const weightMultipliers: [number, number, number, number] = debugParams
+    ? [
+        debugParams.weightMultiplier1,
+        debugParams.weightMultiplier2,
+        debugParams.weightMultiplier3,
+        debugParams.weightMultiplier4,
+      ]
+    : [0.7, 1.5, 1.5, 0.7];
+
+  const { palette, isLoading, error } = useColorExtraction(imageUrl, undefined, weightMultipliers);
 
   // 親要素のサイズを監視
   useEffect(() => {

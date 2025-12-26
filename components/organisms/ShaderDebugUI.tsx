@@ -24,6 +24,10 @@ export interface ShaderDebugParams {
   noiseScale1: number;
   noiseScale2: number;
   distortionAmount: number;
+  weightMultiplier1: number; // 1番目の色のウェイト倍率
+  weightMultiplier2: number; // 2番目の色のウェイト倍率
+  weightMultiplier3: number; // 3番目の色のウェイト倍率
+  weightMultiplier4: number; // 4番目の色のウェイト倍率
 }
 
 const defaultParams: ShaderDebugParams = {
@@ -36,6 +40,10 @@ const defaultParams: ShaderDebugParams = {
   noiseScale1: 0.5,
   noiseScale2: 1.0,
   distortionAmount: 0.2,
+  weightMultiplier1: 0.7, // 1番目の色（明るい）
+  weightMultiplier2: 1.5, // 2番目の色
+  weightMultiplier3: 1.5, // 3番目の色
+  weightMultiplier4: 0.7, // 4番目の色（暗い）
 };
 
 export default function ShaderDebugUI({ onParamsChange, palette }: ShaderDebugUIProps) {
@@ -258,6 +266,75 @@ export default function ShaderDebugUI({ onParamsChange, palette }: ShaderDebugUI
             onChange={(e) => updateParam('noiseScale2', parseFloat(e.target.value))}
             className="w-full"
           />
+        </div>
+
+        {/* Weight Multipliers Section */}
+        <div className="pt-3 border-t border-gray-700">
+          <h4 className="font-semibold mb-2">Color Weight Multipliers</h4>
+
+          {/* Weight Multiplier 1 */}
+          <div>
+            <label className="block mb-1">
+              Color 1 (Brightest): {params.weightMultiplier1.toFixed(2)}x
+            </label>
+            <input
+              type="range"
+              min="0.1"
+              max="3.0"
+              step="0.1"
+              value={params.weightMultiplier1}
+              onChange={(e) => updateParam('weightMultiplier1', parseFloat(e.target.value))}
+              className="w-full"
+            />
+          </div>
+
+          {/* Weight Multiplier 2 */}
+          <div className="mt-2">
+            <label className="block mb-1">
+              Color 2: {params.weightMultiplier2.toFixed(2)}x
+            </label>
+            <input
+              type="range"
+              min="0.1"
+              max="3.0"
+              step="0.1"
+              value={params.weightMultiplier2}
+              onChange={(e) => updateParam('weightMultiplier2', parseFloat(e.target.value))}
+              className="w-full"
+            />
+          </div>
+
+          {/* Weight Multiplier 3 */}
+          <div className="mt-2">
+            <label className="block mb-1">
+              Color 3: {params.weightMultiplier3.toFixed(2)}x
+            </label>
+            <input
+              type="range"
+              min="0.1"
+              max="3.0"
+              step="0.1"
+              value={params.weightMultiplier3}
+              onChange={(e) => updateParam('weightMultiplier3', parseFloat(e.target.value))}
+              className="w-full"
+            />
+          </div>
+
+          {/* Weight Multiplier 4 */}
+          <div className="mt-2">
+            <label className="block mb-1">
+              Color 4 (Darkest): {params.weightMultiplier4.toFixed(2)}x
+            </label>
+            <input
+              type="range"
+              min="0.1"
+              max="3.0"
+              step="0.1"
+              value={params.weightMultiplier4}
+              onChange={(e) => updateParam('weightMultiplier4', parseFloat(e.target.value))}
+              className="w-full"
+            />
+          </div>
         </div>
 
         {/* Distortion Amount */}
