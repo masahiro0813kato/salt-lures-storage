@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/organisms/Header";
 import SearchBar from "@/components/organisms/SearchBar";
@@ -9,7 +10,7 @@ import ScrollToTop from "@/components/organisms/ScrollToTop";
 import { useLuresInfinite } from "@/hooks/useLuresInfinite";
 import { useEffect, useRef } from "react";
 
-export default function LuresPage() {
+function LuresContent() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
   const scrollRestoredRef = useRef(false);
@@ -117,5 +118,13 @@ export default function LuresPage() {
 
       <ScrollToTop />
     </StickyHeaderProvider>
+  );
+}
+
+export default function LuresPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LuresContent />
+    </Suspense>
   );
 }
