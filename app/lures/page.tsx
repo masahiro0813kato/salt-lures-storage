@@ -1,100 +1,116 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
 import Header from "@/components/organisms/Header";
 import SearchBar from "@/components/organisms/SearchBar";
 import StickyHeader, { StickyHeaderProvider } from "@/components/organisms/StickyHeader";
-import LureList from "@/components/organisms/LureList";
+import LureListVirtual from "@/components/organisms/LureListVirtual";
 import ScrollToTop from "@/components/organisms/ScrollToTop";
-import { createClient } from "@/lib/supabase/server";
-import type { LureWithRelations } from "@/types/database";
+import { useLuresInfinite } from "@/hooks/useLuresInfinite";
+import { useEffect, useRef } from "react";
 
-interface SearchParams {
-  search?: string;
-  page?: string;
-}
+export default function LuresPage() {
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search") || "";
+  const scrollRestoredRef = useRef(false);
 
-export default async function LuresPage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>;
-}) {
-  const params = await searchParams;
-  const search = params.search || "";
-  const page = parseInt(params.page || "1", 10);
+  const {
+    lures,
+    total,
+    isLoading,
+    isFetchingMore,
+    hasMore,
+    loadMore,
+  } = useLuresInfinite({
+    searchKey: search,
+    pageSize: 20,
+  });
 
-  // Supabaseから直接データ取得
-  const supabase = await createClient();
+  // スクロール位置の保存と復元
+  useEffect(() => {
+    const savedPosition = sessionStorage.getItem('luresScrollPosition');
+    const savedSearch = sessionStorage.getItem('luresSearchKey');
 
-  const limit = 20;
-  const offset = (page - 1) * limit;
-
-  // メーカー名でも検索できるように
-  let makerIds: number[] = [];
-  if (search) {
-    const { data: makers } = await supabase
-      .from("lure_makers")
-      .select("id")
-      .or(
-        `lure_maker_name_ja.ilike.%${search}%,lure_maker_name_en.ilike.%${search}%`
-      )
-      .eq("is_available", true);
-
-    makerIds = makers?.map((m) => m.id) || [];
-  }
-
-  let query = supabase
-    .from("lures")
-    .select(
-      `
-      *,
-      lure_maker:lure_makers(id, lure_maker_name_ja, lure_maker_name_en, lure_maker_logo_image),
-      lure_category:lure_categories(id, category_name_ja, category_name_en)
-      `,
-      { count: "exact" }
-    )
-    .eq("is_available", true);
-
-  if (search) {
-    if (makerIds.length > 0) {
-      // メーカー名またはルアー名で検索
-      query = query.or(
-        `lure_name_ja.ilike.%${search}%,lure_name_en.ilike.%${search}%,lure_maker_id.in.(${makerIds.join(
-          ","
-        )})`
-      );
-    } else {
-      // ルアー名のみで検索
-      query = query.or(
-        `lure_name_ja.ilike.%${search}%,lure_name_en.ilike.%${search}%`
-      );
+    // 検索条件が変わった場合は位置をクリア
+    if (savedSearch !== search) {
+      sessionStorage.removeItem('luresScrollPosition');
+      sessionStorage.setItem('luresSearchKey', search);
+      scrollRestoredRef.current = false;
+      window.scrollTo(0, 0);
+      return;
     }
-  }
 
-  query = query
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+    // TanStack Queryがキャッシュからデータを即座に復元するので、
+    // luresが存在すれば即座にスクロール位置を復元できる
+    if (savedPosition && lures.length > 0 && !scrollRestoredRef.current) {
+      const scrollY = parseInt(savedPosition);
+      scrollRestoredRef.current = true;
 
-  const { data: lures, error, count } = await query;
+      // 次のフレームでスクロール復元（DOMレンダリング完了を待つ）
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollY);
+        sessionStorage.removeItem('luresScrollPosition');
+      });
+    }
+  }, [lures.length, search]);
 
-  if (error) {
-    console.error("Failed to fetch lures:", error);
-  }
+  // スクロール位置の保存
+  useEffect(() => {
+    if (lures.length === 0) return;
+
+    let isNavigating = false;
+
+    const saveScrollPosition = () => {
+      if (isNavigating) return;
+
+      if (lures.length > 0) {
+        sessionStorage.setItem('luresScrollPosition', window.scrollY.toString());
+      }
+    };
+
+    // スクロール時に保存
+    window.addEventListener('scroll', saveScrollPosition);
+
+    // リンククリック時に確実に保存
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a[href^="/lures/"]');
+      if (link) {
+        isNavigating = true;
+        const currentScrollY = window.scrollY;
+        sessionStorage.setItem('luresScrollPosition', currentScrollY.toString());
+      }
+    };
+
+    document.addEventListener('click', handleClick, true);
+
+    return () => {
+      window.removeEventListener('scroll', saveScrollPosition);
+      document.removeEventListener('click', handleClick, true);
+    };
+  }, [lures.length]);
 
   return (
     <StickyHeaderProvider>
       <StickyHeader>
         <Header />
         <SearchBar latestSearchKey={search} />
-        {count !== null && count > 0 && (
+        {total > 0 && (
           <div className="px-4 pb-2">
-            <div className="text-text-secondary text-sm">全{count}件</div>
+            <div className="text-text-secondary text-sm">全{total}件</div>
           </div>
         )}
       </StickyHeader>
 
       <main className="pt-[200px]">
         <div className="px-4">
-          <LureList
-            lures={(lures as LureWithRelations[]) || []}
-            total={count || 0}
+          <LureListVirtual
+            lures={lures}
+            total={total}
+            isLoading={isLoading}
+            isFetchingMore={isFetchingMore}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
           />
         </div>
       </main>
@@ -103,8 +119,3 @@ export default async function LuresPage({
     </StickyHeaderProvider>
   );
 }
-
-export const metadata = {
-  title: "ルアー検索 | Lure Database",
-  description: "ルアーを検索・閲覧できます",
-};

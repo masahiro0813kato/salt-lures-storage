@@ -27,10 +27,10 @@ export function generateLureUrl(id: number, urlCode: string): string {
 
 /**
  * Parse a lure URL slug to extract ID and code
- * Expected format: "123-a3k9x"
+ * Expected format: "123-a3k9x" or "123-aa58f07b"
  */
 export function parseLureUrl(slug: string): { id: number; code: string } | null {
-  const match = slug.match(/^(\d+)-([a-z0-9]{5})$/);
+  const match = slug.match(/^(\d+)-([a-z0-9]+)$/);
   if (!match) return null;
 
   return {
@@ -49,10 +49,10 @@ export function generateHookUrl(id: number, urlCode: string): string {
 
 /**
  * Parse a hook URL slug to extract ID and code
- * Expected format: "456-k7m2p"
+ * Expected format: "456-k7m2p" or "456-aa58f07b"
  */
 export function parseHookUrl(slug: string): { id: number; code: string } | null {
-  const match = slug.match(/^(\d+)-([a-z0-9]{5})$/);
+  const match = slug.match(/^(\d+)-([a-z0-9]+)$/);
   if (!match) return null;
 
   return {

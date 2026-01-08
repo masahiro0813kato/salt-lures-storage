@@ -8,6 +8,7 @@ import type { LureWithRelations } from "@/types/database";
 // モックデータ
 const mockLure: LureWithRelations = {
   id: 1,
+  lure_id: "lure_1",
   url_code: "a3k9x",
   lure_name_ja: "コモモ SF-125",
   lure_name_en: "komomo SF-125",
@@ -103,12 +104,64 @@ export default async function LureDetailPage({
     notFound();
   }
 
+  // 構造化データ（JSON-LD）
+  const imageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/${lure.lure_id}_main.png`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: lure.lure_name_ja + "| Salt Lure Storage",
+    description:
+      lure.lure_information ||
+      `${lure.lure_maker?.lure_maker_name_ja} ${lure.lure_name_ja}`,
+    image: imageUrl,
+    brand: {
+      "@type": "Brand",
+      name:
+        lure.lure_maker?.lure_maker_name_ja ||
+        lure.lure_maker?.lure_maker_name_en,
+    },
+    offers: {
+      "@type": "Offer",
+      availability: lure.is_available
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+    },
+    additionalProperty: [
+      lure.lure_length && {
+        "@type": "PropertyValue",
+        name: "全長",
+        value: `${lure.lure_length}mm`,
+      },
+      lure.lure_weight && {
+        "@type": "PropertyValue",
+        name: "重量",
+        value: `${lure.lure_weight}g`,
+      },
+      lure.attached_hook_size_1 && {
+        "@type": "PropertyValue",
+        name: "フックサイズ",
+        value: lure.attached_hook_size_1,
+      },
+    ].filter(Boolean),
+  };
+
   return (
     <div className="bg-white min-h-screen">
+      {/* 構造化データ */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <Header fixed={true} />
       <main className="relative">
         {/* 画像セクション */}
-        <LureDetailImage lureId={lure.id} lureName={lure.lure_name_ja} showDebugUI={true} />
+        <LureDetailImage
+          lureId={lure.lure_id}
+          lureName={lure.lure_name_ja}
+          showDebugUI={true}
+        />
 
         {/* データセクション */}
         <section className="relative bg-bg-primary z-50 px-4 py-8 text-white">
@@ -256,10 +309,44 @@ export async function generateMetadata({
 
   if (!lure) return {};
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
+  const pageUrl = `${siteUrl}/lures/${parsed.id}-${parsed.code}`;
+  const imageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/${lure.lure_id}_main.png`;
+
   return {
-    title: `${lure.lure_name_ja} | Lure Database`,
-    description:
-      lure.lure_information ||
-      `${lure.lure_maker?.lure_maker_name_ja} ${lure.lure_name_ja}の詳細情報`,
+    title: lure.lure_name_ja,
+    description: lure.lure_information || "",
+    keywords: [
+      lure.lure_name_ja,
+      lure.lure_maker?.lure_maker_name_ja || "",
+      "ソルトルアー",
+      "フックサイズ",
+      "釣り",
+    ],
+    openGraph: {
+      title: `${lure.lure_name_ja} | Salt Lure Storage`,
+      description: lure.lure_information || "",
+      url: pageUrl,
+      type: "article",
+      locale: "ja_JP",
+      siteName: "Salt Lure Storage",
+      images: [
+        {
+          url: imageUrl,
+          width: 800,
+          height: 600,
+          alt: lure.lure_name_ja,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${lure.lure_name_ja} | Salt Lure Storage`,
+      description: lure.lure_information || "",
+      images: [imageUrl],
+    },
+    alternates: {
+      canonical: pageUrl,
+    },
   };
 }

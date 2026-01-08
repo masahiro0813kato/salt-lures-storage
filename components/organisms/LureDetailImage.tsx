@@ -6,7 +6,7 @@ import LureDetailBackground from "./LureDetailBackground";
 import { generateBlurDataURL } from "@/lib/imageUtils";
 
 interface LureDetailImageProps {
-  lureId: number;
+  lureId: string;
   lureName: string;
   showDebugUI?: boolean;
 }
@@ -18,7 +18,7 @@ export default function LureDetailImage({
   lureName,
   showDebugUI = false,
 }: LureDetailImageProps) {
-  const supabaseImageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/lure_${lureId}.png`;
+  const supabaseImageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/${lureId}_main.png`;
   const [imageSrc, setImageSrc] = useState(supabaseImageUrl);
   const [isDefaultImage, setIsDefaultImage] = useState(false);
   const [imageKey, setImageKey] = useState(0);

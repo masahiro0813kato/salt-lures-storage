@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { LureWithRelations } from "@/types/database";
@@ -9,7 +10,7 @@ interface LureCardProps {
   priority?: boolean;
 }
 
-export default function LureCard({ lure, priority = false }: LureCardProps) {
+function LureCardComponent({ lure, priority = false }: LureCardProps) {
   return (
     <Link
       href={`/lures/${lure.id}-${lure.url_code}`}
@@ -90,12 +91,13 @@ export default function LureCard({ lure, priority = false }: LureCardProps) {
       {/* 画像エリア */}
       <div className="w-1/3 min-w-[120px] flex items-center justify-center">
         <Image
-          src={`https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/lure_${lure.id}.png`}
+          src={`https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lure.lure_id}_thumb.png`}
           alt={lure.lure_name_ja}
           width={120}
           height={80}
           className="w-full h-auto object-cover"
           priority={priority}
+          loading={priority ? undefined : "lazy"}
           unoptimized
           onError={(e) => {
             const target = e.target as HTMLImageElement;
@@ -106,3 +108,12 @@ export default function LureCard({ lure, priority = false }: LureCardProps) {
     </Link>
   );
 }
+
+// React.memoでメモ化してパフォーマンス最適化
+// lure.idが同じ場合は再レンダリングをスキップ
+export default memo(LureCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.lure.id === nextProps.lure.id &&
+    prevProps.priority === nextProps.priority
+  );
+});

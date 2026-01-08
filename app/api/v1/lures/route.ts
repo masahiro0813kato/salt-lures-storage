@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         { count: 'exact' }
       )
       .eq('is_available', true)
-      .order('created_at', { ascending: false });
+      .order('lure_name_ja', { ascending: true });
 
     // 検索条件
     if (search) {

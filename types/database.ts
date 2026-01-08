@@ -26,6 +26,7 @@ export interface LureCategory {
 
 export interface Lure {
   id: number;
+  lure_id: string;
   url_code: string;
   scraping_source_id: string | null;
   lure_maker_id: number;
