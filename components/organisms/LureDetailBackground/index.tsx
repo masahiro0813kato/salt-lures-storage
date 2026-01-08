@@ -31,7 +31,7 @@ export default function LureDetailBackground({
       ]
     : [0.7, 1.5, 1.5, 0.7];
 
-  const { palette, isLoading, error } = useColorExtraction(imageUrl, undefined, weightMultipliers);
+  const { palette, isLoading, error } = useColorExtraction(imageUrl || null, undefined, weightMultipliers);
 
   // 親要素のサイズを監視
   useEffect(() => {
