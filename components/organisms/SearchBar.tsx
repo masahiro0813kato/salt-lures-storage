@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,6 +24,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   const [searchKey, setSearchKey] = useState(latestSearchKey);
   const [suggestLures, setSuggestLures] = useState<SuggestLure[]>([]);
   const [isShow, setIsShow] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isShow) {
@@ -53,6 +54,8 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
 
   const searchLures = () => {
     setIsShow(false);
+    // キーボードを閉じる
+    inputRef.current?.blur();
     router.push(`/lures?search=${searchKey}`);
   };
 
@@ -87,6 +90,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
       <section className="w-full py-4 px-[0.85rem]">
         <div className="relative">
           <input
+            ref={inputRef}
             type="text"
             id="searchLures"
             name="searchLures"
@@ -138,7 +142,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
       </section>
       {isShow && (
         <section
-          className="w-full bg-bg-primary absolute transition-opacity duration-200"
+          className="w-full bg-bg-primary absolute transition-opacity duration-200 overflow-y-auto"
           style={{ height: "calc(100vh - 146px)" }}
         >
           <p className="text-white px-4 py-2">検索</p>
@@ -152,7 +156,10 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
                     backgroundImage:
                       "url('/images/common/icon-arrow-right.svg')",
                   }}
-                  onClick={() => setIsShow(false)}
+                  onClick={() => {
+                    setIsShow(false);
+                    inputRef.current?.blur();
+                  }}
                 >
                   <div className="text-xs text-text-tertiary">
                     {item.lure_maker?.lure_maker_name_en}
