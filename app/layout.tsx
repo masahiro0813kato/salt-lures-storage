@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   },
   description:
     "釣具メーカーの公式サイトから製品情報を自動収集し、統一されたデータベースとして提供する",
+  verification: {
+    google: "mPXec5_5rqm6q715I0yzarx6oRGaDDqc4LRsMpsDnKI",
+  },
   keywords: [
     "ソルトルアー",
     "ルアー",
