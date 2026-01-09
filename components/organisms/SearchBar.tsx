@@ -29,6 +29,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   const suggestListRef = useRef<HTMLElement>(null);
   const { setForceVisible, setIsSearching } = useStickyHeader();
 
+  // 検索UI表示時の処理
   useEffect(() => {
     if (isShow) {
       document.body.style.overflow = "hidden";
@@ -47,6 +48,30 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
       setIsSearching(false);
     };
   }, [isShow, setForceVisible, setIsSearching]);
+
+  // 検索UI外側のクリック検知
+  useEffect(() => {
+    if (!isShow) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // 検索バーのコンテナ要素をチェック
+      const searchContainer = document.getElementById('search-container');
+      if (searchContainer && !searchContainer.contains(target)) {
+        // 外側をクリックした場合、検索UIを閉じる
+        setIsShow(false);
+        setSearchKey(latestSearchKey);
+        setSuggestLures([]);
+        inputRef.current?.blur();
+      }
+    };
+
+    // イベントリスナーを追加（キャプチャフェーズで実行）
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, [isShow, latestSearchKey]);
 
   const getSuggestLures = async (value: string) => {
     if (value.length === 0) {
@@ -97,7 +122,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   };
 
   return (
-    <div className="relative block">
+    <div id="search-container" className="relative block">
       <section className="w-full py-4 px-[0.85rem]">
         <div className="relative">
           <input
@@ -159,7 +184,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
       {isShow && (
         <section
           ref={suggestListRef}
-          className="w-full bg-bg-primary absolute transition-opacity duration-200 overflow-y-auto"
+          className="w-full bg-bg-primary absolute transition-opacity duration-200 overflow-y-auto pointer-events-auto z-[1500]"
           style={{ height: "calc(100vh - 146px)" }}
           onClick={(e) => {
             // リスト要素以外（空白部分）をタップした場合、キーボードを閉じる

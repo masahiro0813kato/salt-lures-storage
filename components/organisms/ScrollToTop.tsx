@@ -32,7 +32,7 @@ export default function ScrollToTop() {
                  flex items-center justify-center cursor-pointer
                  shadow-[0_8px_16px_rgba(0,0,0,0.5)]
                  transform scale-100 active:scale-110 transition-transform duration-100
-                 animate-bounce-in"
+                 animate-bounce-in z-[2000]"
       style={{
         backgroundImage: "url('/images/common/icon-search.svg')",
         backgroundRepeat: 'no-repeat',
