@@ -27,23 +27,26 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   const [isShow, setIsShow] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestListRef = useRef<HTMLElement>(null);
-  const { setForceVisible } = useStickyHeader();
+  const { setForceVisible, setIsSearching } = useStickyHeader();
 
   useEffect(() => {
     if (isShow) {
       document.body.style.overflow = "hidden";
-      // 検索候補表示時は検索バーを強制表示
+      // 検索候補表示時は検索バーを強制表示し、スクロール検知を無効化
       setForceVisible(true);
+      setIsSearching(true);
     } else {
       document.body.style.overflow = "unset";
-      // 検索候補非表示時は強制表示を解除
+      // 検索候補非表示時は強制表示を解除し、スクロール検知を有効化
       setForceVisible(false);
+      setIsSearching(false);
     }
     return () => {
       document.body.style.overflow = "unset";
       setForceVisible(false);
+      setIsSearching(false);
     };
-  }, [isShow, setForceVisible]);
+  }, [isShow, setForceVisible, setIsSearching]);
 
   const getSuggestLures = async (value: string) => {
     if (value.length === 0) {
@@ -115,6 +118,10 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
             onClick={() => {
               if (isShow) {
                 setIsShow(false);
+                // キャンセル時は検索ワードを直前の状態（latestSearchKey）に戻す
+                setSearchKey(latestSearchKey);
+                setSuggestLures([]);
+                inputRef.current?.blur();
               }
             }}
           >
@@ -162,7 +169,12 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
           }}
         >
           <p className="text-white px-4 py-2">検索</p>
-          <ul>
+          <ul
+            onClick={() => {
+              // リスト全体をタップした場合もキーボードを閉じる
+              inputRef.current?.blur();
+            }}
+          >
             {suggestLures.map((item) => (
               <li key={item.id} className="text-white">
                 <Link
