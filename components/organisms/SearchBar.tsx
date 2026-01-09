@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useStickyHeader } from "./StickyHeader";
 
 interface SuggestLure {
   id: number;
@@ -25,17 +26,24 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   const [suggestLures, setSuggestLures] = useState<SuggestLure[]>([]);
   const [isShow, setIsShow] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const suggestListRef = useRef<HTMLElement>(null);
+  const { setForceVisible } = useStickyHeader();
 
   useEffect(() => {
     if (isShow) {
       document.body.style.overflow = "hidden";
+      // 検索候補表示時は検索バーを強制表示
+      setForceVisible(true);
     } else {
       document.body.style.overflow = "unset";
+      // 検索候補非表示時は強制表示を解除
+      setForceVisible(false);
     }
     return () => {
       document.body.style.overflow = "unset";
+      setForceVisible(false);
     };
-  }, [isShow]);
+  }, [isShow, setForceVisible]);
 
   const getSuggestLures = async (value: string) => {
     if (value.length === 0) {
@@ -73,7 +81,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       searchLures();
     }
@@ -97,7 +105,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
             value={searchKey}
             onChange={handleInput}
             onClick={() => setIsShow(true)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder="ルアー名 メーカーで検索"
             className="w-full py-4 pl-12 pr-4 rounded-full text-dark focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-0"
           />
@@ -142,8 +150,15 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
       </section>
       {isShow && (
         <section
+          ref={suggestListRef}
           className="w-full bg-bg-primary absolute transition-opacity duration-200 overflow-y-auto"
           style={{ height: "calc(100vh - 146px)" }}
+          onClick={(e) => {
+            // リスト要素以外（空白部分）をタップした場合、キーボードを閉じる
+            if (e.target === suggestListRef.current) {
+              inputRef.current?.blur();
+            }
+          }}
         >
           <p className="text-white px-4 py-2">検索</p>
           <ul>
