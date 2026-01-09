@@ -106,6 +106,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
             onChange={handleInput}
             onClick={() => setIsShow(true)}
             onKeyDown={handleKeyDown}
+            enterKeyHint="search"
             placeholder="ルアー名 メーカーで検索"
             className="w-full py-4 pl-12 pr-4 rounded-full text-dark focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-0"
           />
