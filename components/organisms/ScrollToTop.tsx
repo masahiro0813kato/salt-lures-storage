@@ -6,7 +6,7 @@ import { useStickyHeader } from './StickyHeader';
 
 export default function ScrollToTop() {
   const [buttonActive, setButtonActive] = useState(false);
-  const { isForceVisible, toggleVisibility } = useStickyHeader();
+  const { isForceVisible, setForceVisible, isSearching } = useStickyHeader();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,10 +20,12 @@ export default function ScrollToTop() {
   }, []);
 
   const handleClick = () => {
-    toggleVisibility();
+    // ヘッダーが非表示の場合は表示、表示中の場合は非表示にトグル
+    setForceVisible(!isForceVisible);
   };
 
-  if (!buttonActive) return null;
+  // スクロールしていない、または検索中は非表示
+  if (!buttonActive || isSearching) return null;
 
   return (
     <div
@@ -32,7 +34,7 @@ export default function ScrollToTop() {
                  flex items-center justify-center cursor-pointer
                  shadow-[0_8px_16px_rgba(0,0,0,0.5)]
                  transform scale-100 active:scale-110 transition-transform duration-100
-                 animate-bounce-in z-[2000]"
+                 animate-bounce-in z-[1000]"
       style={{
         backgroundImage: "url('/images/common/icon-search.svg')",
         backgroundRepeat: 'no-repeat',
