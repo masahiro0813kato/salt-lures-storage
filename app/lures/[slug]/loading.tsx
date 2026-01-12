@@ -6,8 +6,8 @@ export default function Loading() {
       <Header fixed={true} />
       <main className="relative">
         {/* 画像セクション スケルトン */}
-        <section className="relative w-full flex justify-center overflow-hidden bg-gray-200 animate-pulse">
-          <div className="w-4/5 h-[400px] bg-gray-300"></div>
+        <section className="relative w-full flex justify-center overflow-hidden bg-gray-200 animate-pulse" style={{ height: '400px', minHeight: '400px' }}>
+          <div className="w-4/5 h-full bg-gray-300"></div>
         </section>
 
         {/* データセクション スケルトン */}

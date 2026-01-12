@@ -89,15 +89,16 @@ function LureCardComponent({ lure, priority = false }: LureCardProps) {
       </div>
 
       {/* 画像エリア */}
-      <div className="w-1/3 min-w-[120px] flex items-center justify-center">
+      <div className="w-1/3 min-w-[120px] flex items-center justify-center" style={{ aspectRatio: '3/2' }}>
         <Image
           src={`https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lure.lure_id}_thumb.png`}
           alt={lure.lure_name_ja}
           width={120}
           height={80}
-          className="w-full h-auto object-cover"
+          className="w-full h-full object-contain"
           priority={priority}
           loading={priority ? undefined : "lazy"}
+          sizes="(max-width: 768px) 33vw, 120px"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = "/images/common/lure_tmb_default.webp";
