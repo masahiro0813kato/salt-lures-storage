@@ -4,6 +4,9 @@ import LureDetailImage from "@/components/organisms/LureDetailImage";
 import { parseLureUrl } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 
+// ISR設定: 1時間ごとに再生成
+export const revalidate = 3600;
+
 // nl2br関数（改行をbrタグに変換）
 function nl2br(text: string | null | undefined): string {
   if (!text) return "";
