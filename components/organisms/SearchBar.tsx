@@ -49,29 +49,43 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
     };
   }, [isShow, setForceVisible, setIsSearching]);
 
-  // 検索UI外側のクリック検知
+  // キーボード外でのアクション検知（クリック、タッチ、スクロール）
   useEffect(() => {
     if (!isShow) return;
 
-    const handleClickOutside = (e: MouseEvent) => {
+    const inputElement = inputRef.current;
+    if (!inputElement) return;
+
+    // キーボードを閉じる共通処理
+    const closeKeyboard = () => {
+      inputRef.current?.blur();
+    };
+
+    // input要素外をクリック/タッチした場合
+    const handleOutsideInteraction = (e: MouseEvent | TouchEvent) => {
       const target = e.target as HTMLElement;
-      // 検索バーのコンテナ要素をチェック
-      const searchContainer = document.getElementById('search-container');
-      if (searchContainer && !searchContainer.contains(target)) {
-        // 外側をクリックした場合、検索UIを閉じる
-        setIsShow(false);
-        setSearchKey(latestSearchKey);
-        setSuggestLures([]);
-        inputRef.current?.blur();
+      // input要素以外をクリック/タッチした場合、キーボードを閉じる
+      if (target !== inputElement && !inputElement.contains(target)) {
+        closeKeyboard();
       }
     };
 
-    // イベントリスナーを追加（キャプチャフェーズで実行）
-    document.addEventListener('click', handleClickOutside, true);
-    return () => {
-      document.removeEventListener('click', handleClickOutside, true);
+    // スクロールした場合
+    const handleScroll = () => {
+      closeKeyboard();
     };
-  }, [isShow, latestSearchKey]);
+
+    // 各種イベントリスナーを追加
+    document.addEventListener('mousedown', handleOutsideInteraction, true);
+    document.addEventListener('touchstart', handleOutsideInteraction, true);
+    document.addEventListener('scroll', handleScroll, true);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideInteraction, true);
+      document.removeEventListener('touchstart', handleOutsideInteraction, true);
+      document.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [isShow]);
 
   const getSuggestLures = async (value: string) => {
     if (value.length === 0) {
@@ -186,20 +200,9 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
           ref={suggestListRef}
           className="w-full bg-bg-primary absolute transition-opacity duration-200 overflow-y-auto pointer-events-auto z-[1500]"
           style={{ height: "calc(100vh - 146px)" }}
-          onClick={(e) => {
-            // リスト要素以外（空白部分）をタップした場合、キーボードを閉じる
-            if (e.target === suggestListRef.current) {
-              inputRef.current?.blur();
-            }
-          }}
         >
           <p className="text-white px-4 py-2">検索</p>
-          <ul
-            onClick={() => {
-              // リスト全体をタップした場合もキーボードを閉じる
-              inputRef.current?.blur();
-            }}
-          >
+          <ul>
             {suggestLures.map((item) => (
               <li key={item.id} className="text-white">
                 <Link
