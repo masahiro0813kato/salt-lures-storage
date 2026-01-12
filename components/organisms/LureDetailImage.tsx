@@ -52,7 +52,6 @@ export default function LureDetailImage({
         placeholder="blur"
         blurDataURL={blurDataURL}
         onError={handleImageError}
-        unoptimized={isDefaultImage}
       />
     </section>
   );

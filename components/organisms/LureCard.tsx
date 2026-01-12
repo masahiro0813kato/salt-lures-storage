@@ -98,7 +98,6 @@ function LureCardComponent({ lure, priority = false }: LureCardProps) {
           className="w-full h-auto object-cover"
           priority={priority}
           loading={priority ? undefined : "lazy"}
-          unoptimized
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = "/images/common/lure_tmb_default.webp";
