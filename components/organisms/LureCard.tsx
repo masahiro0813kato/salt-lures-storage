@@ -99,17 +99,16 @@ function LureCardComponent({ lure, priority = false }: LureCardProps) {
       </div>
 
       {/* 画像エリア */}
-      <div className="w-1/3 min-w-[120px] flex items-center justify-center" style={{ aspectRatio: '3/2' }}>
+      <div className="w-1/3 min-w-[120px] flex items-center justify-center">
         <Image
           key={imageKey}
           src={imageSrc}
           alt={lure.lure_name_ja}
           width={120}
           height={80}
-          className="w-full h-full object-contain"
+          className="w-full h-auto object-cover"
           priority={priority}
           loading={priority ? undefined : "lazy"}
-          sizes="(max-width: 768px) 33vw, 120px"
           onError={handleImageError}
         />
       </div>
