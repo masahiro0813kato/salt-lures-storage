@@ -95,7 +95,7 @@ export default async function LureDetailPage({
         <LureDetailImage
           lureId={lure.lure_id}
           lureName={lure.lure_name_ja}
-          showDebugUI={process.env.NODE_ENV === 'development'}
+          showDebugUI={process.env.NEXT_PUBLIC_SHOW_DEBUG_UI === 'true'}
         />
 
         {/* データセクション */}
