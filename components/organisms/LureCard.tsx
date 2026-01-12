@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { LureWithRelations } from "@/types/database";
@@ -11,6 +11,16 @@ interface LureCardProps {
 }
 
 function LureCardComponent({ lure, priority = false }: LureCardProps) {
+  const [imageSrc, setImageSrc] = useState(
+    `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lure.lure_id}_thumb.png`
+  );
+  const [imageKey, setImageKey] = useState(0);
+
+  const handleImageError = () => {
+    setImageSrc("/images/common/lure_tmb_default.webp");
+    setImageKey(prev => prev + 1);
+  };
+
   return (
     <Link
       href={`/lures/${lure.id}-${lure.url_code}`}
@@ -91,7 +101,8 @@ function LureCardComponent({ lure, priority = false }: LureCardProps) {
       {/* 画像エリア */}
       <div className="w-1/3 min-w-[120px] flex items-center justify-center" style={{ aspectRatio: '3/2' }}>
         <Image
-          src={`https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lure.lure_id}_thumb.png`}
+          key={imageKey}
+          src={imageSrc}
           alt={lure.lure_name_ja}
           width={120}
           height={80}
@@ -99,10 +110,7 @@ function LureCardComponent({ lure, priority = false }: LureCardProps) {
           priority={priority}
           loading={priority ? undefined : "lazy"}
           sizes="(max-width: 768px) 33vw, 120px"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = "/images/common/lure_tmb_default.webp";
-          }}
+          onError={handleImageError}
         />
       </div>
     </Link>
