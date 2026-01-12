@@ -91,21 +91,15 @@ export default function LureDetailBackground({
     }
   }, [palette, isLoading, error]);
 
-  console.log('LureDetailBackground:', { imageUrl, dimensions, palette, isLoading, error });
-
   // デフォルト画像または画像なしの場合は白背景
   if (isDefaultImage(imageUrl)) {
-    console.log('Showing white background: default image');
     return <div ref={containerRef} className="absolute inset-0 bg-white" />;
   }
 
   // エラー時は白背景
   if (error) {
-    console.log('Showing white background: error', error);
     return <div ref={containerRef} className="absolute inset-0 bg-white" />;
   }
-
-  console.log('Rendering canvas or loading');
 
   // ローディング中またはcanvas準備中は白背景を表示
   // paletteがある場合はcanvasを重ねてフェードイン

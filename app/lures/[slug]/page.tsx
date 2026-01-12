@@ -3,71 +3,6 @@ import Header from "@/components/organisms/Header";
 import LureDetailImage from "@/components/organisms/LureDetailImage";
 import { parseLureUrl } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
-import type { LureWithRelations } from "@/types/database";
-
-// モックデータ
-const mockLure: LureWithRelations = {
-  id: 1,
-  lure_id: "lure_1",
-  url_code: "a3k9x",
-  lure_name_ja: "コモモ SF-125",
-  lure_name_en: "komomo SF-125",
-  lure_main_image: "komomo_sf125",
-  lure_tmb_image: "komomo_sf125",
-  attached_hook_size_1: "#6",
-  attached_hook_size_2: "#4",
-  attached_hook_size_3: null,
-  attached_hook_size_4: null,
-  attached_hook_size_5: null,
-  attached_ring_size: "#2",
-  lure_buoyancy: "Floating",
-  lure_action: "ローリング",
-  lure_length: 125,
-  lure_weight: 16,
-  lure_range_min: 10,
-  lure_range_max: 50,
-  lure_information:
-    "シーバス向けフローティングミノー。\n水面直下をゆっくりと引くことができる。",
-  lure_maker: {
-    id: 1,
-    slug: "ima",
-    lure_maker_name_ja: "アイマ",
-    lure_maker_name_en: "ima",
-    lure_maker_logo_image: null,
-    lure_maker_ref_url: null,
-    description: null,
-    is_available: true,
-    created_at: "2025-01-01T00:00:00Z",
-    updated_at: "2025-01-01T00:00:00Z",
-  },
-  lure_category: {
-    id: 1,
-    slug: "floating-minnow",
-    category_name_ja: "フローティングミノー",
-    category_name_en: "Floating Minnow",
-    description: null,
-    display_order: 1,
-    is_visible: true,
-    created_at: "2025-01-01T00:00:00Z",
-  },
-  lure_maker_id: 1,
-  lure_category_id: 1,
-  scraping_source_id: null,
-  lure_tmb_small: null,
-  lure_tmb_medium: null,
-  lure_shape: null,
-  lure_ref_url: null,
-  target_fish_1: null,
-  target_fish_2: null,
-  target_fish_3: null,
-  target_fish_4: null,
-  target_fish_5: null,
-  view_count: 0,
-  data_version: 1,
-  is_available: true,
-  created_at: "2025-01-01T00:00:00Z",
-  updated_at: "2025-01-01T00:00:00Z",
-};
 
 // nl2br関数（改行をbrタグに変換）
 function nl2br(text: string | null | undefined): string {
@@ -160,7 +95,7 @@ export default async function LureDetailPage({
         <LureDetailImage
           lureId={lure.lure_id}
           lureName={lure.lure_name_ja}
-          showDebugUI={true}
+          showDebugUI={process.env.NODE_ENV === 'development'}
         />
 
         {/* データセクション */}

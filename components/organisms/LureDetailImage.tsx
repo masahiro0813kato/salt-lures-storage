@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import LureDetailBackground from "./LureDetailBackground";
 import { generateBlurDataURL } from "@/lib/imageUtils";
@@ -27,7 +27,6 @@ export default function LureDetailImage({
   const blurDataURL = generateBlurDataURL(800, 600, '#e5e7eb');
 
   const handleImageError = () => {
-    console.log('Image load error, switching to default image');
     setImageSrc(DEFAULT_IMAGE);
     setIsDefaultImage(true);
     setImageKey(prev => prev + 1); // 強制的に再レンダリング
