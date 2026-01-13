@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { LureWithRelations } from "@/types/database";
@@ -11,13 +11,26 @@ interface LureCardProps {
 }
 
 function LureCardComponent({ lure, priority = false }: LureCardProps) {
-  const [imageSrc, setImageSrc] = useState(
-    `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lure.lure_id}_thumb.png`
-  );
+  const originalImageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lure.lure_id}_thumb.png`;
+  const defaultImageUrl = "/images/common/lure_tmb_default.webp";
+
+  const [imageSrc, setImageSrc] = useState(originalImageUrl);
   const [imageKey, setImageKey] = useState(0);
+  const hasErrorRef = useRef(false);
+
+  // lure_idが変わったときに状態をリセット
+  useEffect(() => {
+    setImageSrc(originalImageUrl);
+    hasErrorRef.current = false;
+    setImageKey(0);
+  }, [lure.lure_id, originalImageUrl]);
 
   const handleImageError = () => {
-    setImageSrc("/images/common/lure_tmb_default.webp");
+    // エラーが既に処理済みの場合は何もしない
+    if (hasErrorRef.current) return;
+
+    hasErrorRef.current = true;
+    setImageSrc(defaultImageUrl);
     setImageKey(prev => prev + 1);
   };
 
@@ -109,6 +122,7 @@ function LureCardComponent({ lure, priority = false }: LureCardProps) {
           className="w-full h-auto object-cover"
           priority={priority}
           loading={priority ? undefined : "lazy"}
+          unoptimized={process.env.NODE_ENV === 'development'}
           onError={handleImageError}
         />
       </div>
