@@ -48,7 +48,10 @@ export default function LureDetailImage({
         width={800}
         height={600}
         className="relative z-10 w-4/5 h-auto object-contain"
-        style={{ maxHeight: '400px' }}
+        style={{
+          maxHeight: '400px',
+          filter: 'drop-shadow(4px 8px 8px rgba(0, 0, 0, 0.25))'
+        }}
         priority
         placeholder="blur"
         blurDataURL={blurDataURL}
