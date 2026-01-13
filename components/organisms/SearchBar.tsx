@@ -199,7 +199,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
         <section
           ref={suggestListRef}
           className="w-full bg-bg-primary absolute transition-opacity duration-200 overflow-y-auto pointer-events-auto z-[1500]"
-          style={{ height: "calc(100vh - 146px)" }}
+          style={{ height: "calc(100vh - 144px)" }}
         >
           <p className="text-white px-4 py-2">検索</p>
           <ul>
