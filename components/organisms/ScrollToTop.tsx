@@ -1,53 +1,56 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { useStickyHeader } from './StickyHeader';
+// import { useState, useEffect } from 'react';
+// import Image from 'next/image';
+// import { useStickyHeader } from './StickyHeader';
 
 export default function ScrollToTop() {
-  const [buttonActive, setButtonActive] = useState(false);
-  const { isForceVisible, setForceVisible, isSearching } = useStickyHeader();
+  // const [buttonActive, setButtonActive] = useState(false);
+  // const { isForceVisible, setForceVisible, isSearching } = useStickyHeader();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const top = 100; // topから100pxスクロールしたらボタン登場
-      const scroll = window.scrollY;
-      setButtonActive(scroll >= top);
-    };
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const top = 100; // topから100pxスクロールしたらボタン登場
+  //     const scroll = window.scrollY;
+  //     setButtonActive(scroll >= top);
+  //   };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  //   window.addEventListener('scroll', handleScroll);
+  //   return () => window.removeEventListener('scroll', handleScroll);
+  // }, []);
 
-  const handleClick = () => {
-    // ヘッダーが非表示の場合は表示、表示中の場合は非表示にトグル
-    setForceVisible(!isForceVisible);
-  };
+  // const handleClick = () => {
+  //   // ヘッダーが非表示の場合は表示、表示中の場合は非表示にトグル
+  //   setForceVisible(!isForceVisible);
+  // };
+
+  // 一時的に非表示
+  return null;
 
   // スクロールしていない、または検索中は非表示
-  if (!buttonActive || isSearching) return null;
+  // if (!buttonActive || isSearching) return null;
 
-  return (
-    <div
-      onClick={handleClick}
-      className="fixed bottom-4 right-2 w-12 h-12 bg-accent-green rounded-full
-                 flex items-center justify-center cursor-pointer
-                 shadow-[0_8px_16px_rgba(0,0,0,0.5)]
-                 transform scale-100 active:scale-110 transition-transform duration-100
-                 animate-bounce-in z-[1000]"
-      style={{
-        backgroundImage: "url('/images/common/icon-search.svg')",
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: '50% 50%',
-      }}
-    >
-      <Image
-        src="/images/common/icon-search.svg"
-        alt={isForceVisible ? "ヘッダーを隠す" : "ヘッダーを表示"}
-        width={24}
-        height={24}
-        className="opacity-0"
-      />
-    </div>
-  );
+  // return (
+  //   <div
+  //     onClick={handleClick}
+  //     className="fixed bottom-4 right-2 w-12 h-12 bg-accent-green rounded-full
+  //                flex items-center justify-center cursor-pointer
+  //                shadow-[0_8px_16px_rgba(0,0,0,0.5)]
+  //                transform scale-100 active:scale-110 transition-transform duration-100
+  //                animate-bounce-in z-[1000]"
+  //     style={{
+  //       backgroundImage: "url('/images/common/icon-search.svg')",
+  //       backgroundRepeat: 'no-repeat',
+  //       backgroundPosition: '50% 50%',
+  //     }}
+  //   >
+  //     <Image
+  //       src="/images/common/icon-search.svg"
+  //       alt={isForceVisible ? "ヘッダーを隠す" : "ヘッダーを表示"}
+  //       width={24}
+  //       height={24}
+  //       className="opacity-0"
+  //     />
+  //   </div>
+  // );
 }
