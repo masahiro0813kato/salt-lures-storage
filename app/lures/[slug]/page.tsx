@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Header from "@/components/organisms/Header";
 import LureDetailImage from "@/components/organisms/LureDetailImage";
+import ScrollReset from "@/components/organisms/ScrollReset";
 import { parseLureUrl } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 
@@ -91,6 +92,9 @@ export default async function LureDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* スクロール位置を0にリセット */}
+      <ScrollReset />
 
       <Header fixed={true} />
       <main className="relative">
