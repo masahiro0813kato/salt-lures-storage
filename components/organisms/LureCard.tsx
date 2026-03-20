@@ -124,7 +124,7 @@ function LureCardComponent({ lure, priority = false }: LureCardProps) {
           priority={priority}
           loading={priority ? undefined : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
-          unoptimized={process.env.NODE_ENV === 'development'}
+          unoptimized
           onError={handleImageError}
         />
       </div>

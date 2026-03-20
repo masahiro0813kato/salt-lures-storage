@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   compress: true,
+  productionBrowserSourceMaps: true,
 };
 
 export default nextConfig;
