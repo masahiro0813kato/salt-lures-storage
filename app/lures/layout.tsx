@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://salt-lure-storage.com';
 
 export const metadata: Metadata = {
   title: {

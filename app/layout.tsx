@@ -4,7 +4,7 @@ import { ReactQueryProvider } from "@/components/providers/ReactQueryProvider";
 // ▼ 追加: GTMのインポート
 import { GoogleTagManager } from "@next/third-parties/google";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://salt-lure-storage.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -68,6 +68,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        <link rel="preconnect" href="https://acnvuvzuswsyrbczxzko.supabase.co" />
+        <link rel="dns-prefetch" href="https://acnvuvzuswsyrbczxzko.supabase.co" />
+      </head>
       {/* ▼ 追加: GTMコンポーネント (bodyタグの前に配置するのが一般的です) */}
       <GoogleTagManager gtmId="GTM-M2P73Z58" />
 

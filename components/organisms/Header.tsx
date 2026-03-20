@@ -16,7 +16,7 @@ export default function Header({ fixed = false }: HeaderProps) {
             width={120}
             height={40}
             priority
-            style={{ width: 'auto', height: 'auto' }}
+            style={{ width: '120px', height: '40px' }}
           />
         </Link>
       </div>

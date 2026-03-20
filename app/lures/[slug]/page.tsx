@@ -4,9 +4,25 @@ import LureDetailImage from "@/components/organisms/LureDetailImage";
 import ScrollReset from "@/components/organisms/ScrollReset";
 import { parseLureUrl } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
+import { createStaticClient } from "@/lib/supabase/static";
 
 // ISR設定: 1時間ごとに再生成
 export const revalidate = 3600;
+
+// ビルド時に全ルアーページを静的生成
+export async function generateStaticParams() {
+  const supabase = createStaticClient();
+  const { data: lures } = await supabase
+    .from('lures')
+    .select('id, url_code')
+    .eq('is_available', true);
+
+  return (
+    lures?.map((lure) => ({
+      slug: `${lure.id}-${lure.url_code}`,
+    })) || []
+  );
+}
 
 // nl2br関数（改行をbrタグに変換）
 function nl2br(text: string | null | undefined): string {
@@ -59,12 +75,6 @@ export default async function LureDetailPage({
       name:
         lure.lure_maker?.lure_maker_name_ja ||
         lure.lure_maker?.lure_maker_name_en,
-    },
-    offers: {
-      "@type": "Offer",
-      availability: lure.is_available
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
     },
     additionalProperty: [
       lure.lure_length && {
@@ -251,7 +261,7 @@ export async function generateMetadata({
 
   if (!lure) return {};
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://salt-lure-storage.com";
   const pageUrl = `${siteUrl}/lures/${parsed.id}-${parsed.code}`;
   const imageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/${lure.lure_id}_main.png`;
 

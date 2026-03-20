@@ -27,9 +27,10 @@ export default function LureDetailImage({
   const blurDataURL = generateBlurDataURL(800, 600, '#e5e7eb');
 
   const handleImageError = () => {
+    if (imageSrc === DEFAULT_IMAGE) return;
     setImageSrc(DEFAULT_IMAGE);
     setIsDefaultImage(true);
-    setImageKey(prev => prev + 1); // 強制的に再レンダリング
+    setImageKey(prev => prev + 1);
   };
 
   return (
@@ -53,8 +54,10 @@ export default function LureDetailImage({
           filter: 'drop-shadow(4px 8px 8px rgba(0, 0, 0, 0.25))'
         }}
         priority
+        fetchPriority="high"
         placeholder="blur"
         blurDataURL={blurDataURL}
+        unoptimized={isDefaultImage}
         onError={handleImageError}
       />
     </section>

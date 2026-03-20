@@ -112,7 +112,7 @@ function LureCardComponent({ lure, priority = false }: LureCardProps) {
       </div>
 
       {/* 画像エリア */}
-      <div className="w-1/3 min-w-[120px] flex items-center justify-center">
+      <div className="w-1/3 min-w-[120px] flex items-center justify-center" style={{ aspectRatio: '3/2' }}>
         <Image
           key={imageKey}
           src={imageSrc}
@@ -120,8 +120,10 @@ function LureCardComponent({ lure, priority = false }: LureCardProps) {
           width={120}
           height={80}
           className="w-full h-auto object-cover"
+          style={{ width: '100%', height: 'auto' }}
           priority={priority}
           loading={priority ? undefined : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
           unoptimized={process.env.NODE_ENV === 'development'}
           onError={handleImageError}
         />
