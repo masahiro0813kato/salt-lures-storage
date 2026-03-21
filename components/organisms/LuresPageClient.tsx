@@ -207,7 +207,7 @@ function LuresContent() {
         </main>
       ) : (
         /* モバイル: 従来のレイアウト */
-        <main className="pt-[200px] max-w-[420px] mx-auto">
+        <main className="pt-[200px] pb-20 max-w-[420px] mx-auto">
           <div className="px-4">
             <LureListVirtual
               lures={lures}

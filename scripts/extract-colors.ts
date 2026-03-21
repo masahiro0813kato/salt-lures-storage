@@ -353,7 +353,7 @@ async function main() {
 
       try {
         // ColorThiefで20色抽出（フロントエンドのcolor-thief-browserと同一アルゴリズム）
-        const rawPalette = await ColorThief.getPalette(tmpFile, 20);
+        const rawPalette = await (ColorThief as any).getPalette(tmpFile, 20) as ColorThiefColor[];
 
         if (!rawPalette || rawPalette.length === 0) {
           console.log(`⏭️ ${lure.lure_name_ja} - 色抽出失敗（スキップ）`);

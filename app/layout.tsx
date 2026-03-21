@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ReactQueryProvider } from "@/components/providers/ReactQueryProvider";
+import MobileFooter from "@/components/organisms/MobileFooter";
 // ▼ 追加: GTMのインポート
 import { GoogleTagManager } from "@next/third-parties/google";
 
@@ -76,7 +77,10 @@ export default function RootLayout({
       <GoogleTagManager gtmId="GTM-M2P73Z58" />
 
       <body className="antialiased" suppressHydrationWarning>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ReactQueryProvider>
+          {children}
+          <MobileFooter />
+        </ReactQueryProvider>
       </body>
     </html>
   );

@@ -33,13 +33,14 @@ export default function RankingCard({
       className="block min-w-[160px] w-[160px] rounded-lg overflow-hidden bg-white hover:scale-105 transition-transform duration-200"
     >
       {/* 画像エリア */}
-      <div className="relative w-full aspect-square bg-gray-100 flex items-center justify-center">
+      <div className="relative w-full h-[120px] bg-white flex items-center justify-end">
         <Image
           src={imageSrc}
           alt={lureName}
-          width={160}
-          height={160}
-          className="w-full h-full object-cover"
+          width={150}
+          height={100}
+          className="object-cover"
+          style={{ width: '140px', height: 'auto' }}
           unoptimized
           onError={() => setImageSrc(defaultImageUrl)}
         />
