@@ -180,7 +180,7 @@ function LuresContent() {
           {/* 左パネル: 一覧 */}
           <div
             ref={leftPanelRef}
-            className="w-[420px] min-w-[420px] overflow-y-auto px-4 pt-1"
+            className="w-[420px] min-w-[420px] overflow-y-auto px-4 pt-1 scrollbar-hide"
           >
             <LureListVirtual
               lures={lures}
