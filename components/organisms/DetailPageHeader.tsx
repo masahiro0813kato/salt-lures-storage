@@ -55,6 +55,7 @@ export default function DetailPageHeader() {
             width={120}
             height={40}
             priority
+            fetchPriority="high"
             style={{ width: '120px', height: '40px' }}
           />
         </Link>
