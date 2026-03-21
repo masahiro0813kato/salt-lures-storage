@@ -70,6 +70,19 @@
     scrollbar-width: none;
   }
 
+  /* 管理画面のフォーム要素の色をリセット */
+  .admin-reset,
+  .admin-reset * {
+    color: inherit;
+  }
+  .admin-reset input,
+  .admin-reset select,
+  .admin-reset textarea,
+  .admin-reset button,
+  .admin-reset optgroup {
+    color: #111827;
+  }
+
   /* 既存デザインと同じ背景色 */
   html {
     background-color: #2a262f;

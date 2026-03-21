@@ -1,0 +1,15 @@
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json([], { status: 401 });
+
+  const { data } = await supabase
+    .from("lure_makers")
+    .select("id, lure_maker_name_ja")
+    .order("lure_maker_name_ja");
+
+  return NextResponse.json(data || []);
+}
