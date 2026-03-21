@@ -54,7 +54,7 @@ export default function RankingSection({ title, period }: RankingSectionProps) {
           </div>
         </div>
       ) : (
-        <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
+        <div className="flex gap-3 overflow-x-auto px-4 py-2 scrollbar-hide">
           {rankings.map((item, index) => (
             <RankingCard
               key={item.lure_id}

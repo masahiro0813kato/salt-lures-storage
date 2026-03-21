@@ -294,6 +294,8 @@ async function main() {
         "target_fish_3",
         "target_fish_4",
         "target_fish_5",
+        "lure_series_ja",
+        "lure_series_en",
       ];
 
       optionalColumns.forEach((col) => {

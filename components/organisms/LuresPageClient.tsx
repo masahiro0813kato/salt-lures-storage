@@ -197,7 +197,7 @@ function LuresContent() {
           {/* 右パネル: 詳細 */}
           <div className="flex-1 overflow-y-auto">
             {selectedLure ? (
-              <LureDetailPanel key={selectedLure.id} lure={selectedLure} horizontal={isWideDesktop} />
+              <LureDetailPanel key={selectedLure.id} lure={selectedLure} horizontal={isWideDesktop} onSelectLure={handleSelectLure} />
             ) : (
               <div className="flex items-center justify-center h-full text-text-secondary">
                 ルアーを選択してください

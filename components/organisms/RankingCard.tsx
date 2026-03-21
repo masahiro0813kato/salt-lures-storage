@@ -46,12 +46,15 @@ export default function RankingCard({
           priority={priority}
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
+          unoptimized
           onError={() => setImageSrc(defaultImageUrl)}
         />
         {/* 順位バッジ */}
-        <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-bg-primary text-white text-sm font-bold flex items-center justify-center">
-          {rank}
-        </div>
+        {rank > 0 && (
+          <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-bg-primary text-white text-sm font-bold flex items-center justify-center">
+            {rank}
+          </div>
+        )}
       </div>
 
       {/* 情報エリア */}
@@ -59,7 +62,7 @@ export default function RankingCard({
         <div className="text-xs text-text-tertiary leading-none mb-1">
           {makerName}
         </div>
-        <div className="text-sm text-dark font-medium leading-tight line-clamp-2">
+        <div className="text-sm text-dark font-medium leading-tight line-clamp-2 min-h-[2.5rem]">
           {lureName}
         </div>
         {/* <div className="text-xs text-text-tertiary mt-1">

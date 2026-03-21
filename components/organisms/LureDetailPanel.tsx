@@ -1,12 +1,14 @@
 "use client";
 
 import LureDetailImage from "./LureDetailImage";
+import SeriesSection from "./SeriesSection";
 import { useTrackView } from "@/hooks/useTrackView";
 import type { LureWithRelations } from "@/types/database";
 
 interface LureDetailPanelProps {
   lure: LureWithRelations;
   horizontal?: boolean;
+  onSelectLure?: (lure: LureWithRelations) => void;
 }
 
 function nl2br(text: string | null | undefined): string {
@@ -99,7 +101,7 @@ function SpecSection({ lure }: { lure: LureWithRelations }) {
 }
 
 // 1024px以上: 横並びレイアウト
-function HorizontalLayout({ lure }: { lure: LureWithRelations; }) {
+function HorizontalLayout({ lure, onSelectLure }: { lure: LureWithRelations; onSelectLure?: (lure: LureWithRelations) => void }) {
   return (
     <div className="h-full flex bg-bg-primary text-white">
       {/* 左: 画像 + タイトル */}
@@ -132,13 +134,21 @@ function HorizontalLayout({ lure }: { lure: LureWithRelations; }) {
             />
           </div>
         )}
+
+        {lure.lure_series_ja && (
+          <SeriesSection
+            seriesName={lure.lure_series_ja}
+            currentLureId={lure.id}
+            onSelectLure={onSelectLure}
+          />
+        )}
       </div>
     </div>
   );
 }
 
 // 768-1024px: 縦並びレイアウト
-function VerticalLayout({ lure }: { lure: LureWithRelations }) {
+function VerticalLayout({ lure, onSelectLure }: { lure: LureWithRelations; onSelectLure?: (lure: LureWithRelations) => void }) {
   return (
     <div className="h-full overflow-y-auto">
       <LureDetailImage
@@ -165,16 +175,24 @@ function VerticalLayout({ lure }: { lure: LureWithRelations }) {
           className="whitespace-pre-line text-sm"
           dangerouslySetInnerHTML={{ __html: nl2br(lure.lure_information) }}
         />
+
+        {lure.lure_series_ja && (
+          <SeriesSection
+            seriesName={lure.lure_series_ja}
+            currentLureId={lure.id}
+            onSelectLure={onSelectLure}
+          />
+        )}
       </section>
     </div>
   );
 }
 
-export default function LureDetailPanel({ lure, horizontal = false }: LureDetailPanelProps) {
+export default function LureDetailPanel({ lure, horizontal = false, onSelectLure }: LureDetailPanelProps) {
   useTrackView(lure.id);
 
   if (horizontal) {
-    return <HorizontalLayout lure={lure} />;
+    return <HorizontalLayout lure={lure} onSelectLure={onSelectLure} />;
   }
-  return <VerticalLayout lure={lure} />;
+  return <VerticalLayout lure={lure} onSelectLure={onSelectLure} />;
 }
