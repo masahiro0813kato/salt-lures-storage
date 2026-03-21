@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,18 +27,17 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   const [isShow, setIsShow] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestListRef = useRef<HTMLElement>(null);
+  const isComposingRef = useRef(false);
   const { setForceVisible, setIsSearching } = useStickyHeader();
 
   // 検索UI表示時の処理
   useEffect(() => {
     if (isShow) {
       document.body.style.overflow = "hidden";
-      // 検索候補表示時は検索バーを強制表示し、スクロール検知を無効化
       setForceVisible(true);
       setIsSearching(true);
     } else {
       document.body.style.overflow = "unset";
-      // 検索候補非表示時は強制表示を解除し、スクロール検知を有効化
       setForceVisible(false);
       setIsSearching(false);
     }
@@ -56,26 +55,21 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
     const inputElement = inputRef.current;
     if (!inputElement) return;
 
-    // キーボードを閉じる共通処理
     const closeKeyboard = () => {
       inputRef.current?.blur();
     };
 
-    // input要素外をクリック/タッチした場合
     const handleOutsideInteraction = (e: MouseEvent | TouchEvent) => {
       const target = e.target as HTMLElement;
-      // input要素以外をクリック/タッチした場合、キーボードを閉じる
       if (target !== inputElement && !inputElement.contains(target)) {
         closeKeyboard();
       }
     };
 
-    // スクロールした場合
     const handleScroll = () => {
       closeKeyboard();
     };
 
-    // 各種イベントリスナーを追加
     document.addEventListener('mousedown', handleOutsideInteraction, true);
     document.addEventListener('touchstart', handleOutsideInteraction, true);
     document.addEventListener('scroll', handleScroll, true);
@@ -102,18 +96,16 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
     }
   };
 
-  const searchLures = () => {
+  const searchLures = useCallback(() => {
     setIsShow(false);
-    // キーボードを閉じる
     inputRef.current?.blur();
-    router.push(`/lures?search=${searchKey}`);
-  };
+    const value = inputRef.current?.value || "";
+    router.push(`/lures?search=${value}`);
+  }, [router]);
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const updateFromInput = useCallback(() => {
+    const value = inputRef.current?.value || "";
     setSearchKey(value);
-
-    // 入力があれば自動的にサジェストを表示
     if (value.length > 0) {
       setIsShow(true);
       getSuggestLures(value);
@@ -121,17 +113,51 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
       setIsShow(false);
       setSuggestLures([]);
     }
-  };
+  }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      searchLures();
-    }
-  };
+  // ネイティブイベントで入力を処理（React onChangeのIME問題を回避）
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const onInput = () => {
+      // IME変換中はサジェスト更新をスキップ
+      if (isComposingRef.current) return;
+      updateFromInput();
+    };
+
+    const onCompositionStart = () => {
+      isComposingRef.current = true;
+    };
+
+    const onCompositionEnd = () => {
+      isComposingRef.current = false;
+      updateFromInput();
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && !isComposingRef.current) {
+        searchLures();
+      }
+    };
+
+    input.addEventListener("input", onInput);
+    input.addEventListener("compositionstart", onCompositionStart);
+    input.addEventListener("compositionend", onCompositionEnd);
+    input.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      input.removeEventListener("input", onInput);
+      input.removeEventListener("compositionstart", onCompositionStart);
+      input.removeEventListener("compositionend", onCompositionEnd);
+      input.removeEventListener("keydown", onKeyDown);
+    };
+  }, [searchLures, updateFromInput]);
 
   const handleClear = () => {
     setSearchKey("");
     setSuggestLures([]);
+    if (inputRef.current) inputRef.current.value = "";
     router.push("/lures");
   };
 
@@ -144,10 +170,8 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
             type="text"
             id="searchLures"
             name="searchLures"
-            value={searchKey}
-            onChange={handleInput}
+            defaultValue={searchKey}
             onClick={() => setIsShow(true)}
-            onKeyDown={handleKeyDown}
             enterKeyHint="search"
             placeholder="ルアー名 メーカーで検索"
             className="w-full py-4 pl-12 pr-4 rounded-full text-dark focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-0"
@@ -157,8 +181,8 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
             onClick={() => {
               if (isShow) {
                 setIsShow(false);
-                // キャンセル時は検索ワードを直前の状態（latestSearchKey）に戻す
                 setSearchKey(latestSearchKey);
+                if (inputRef.current) inputRef.current.value = latestSearchKey;
                 setSuggestLures([]);
                 inputRef.current?.blur();
               }
