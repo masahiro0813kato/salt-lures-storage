@@ -65,7 +65,7 @@ export default async function LureDetailPage({
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Thing",
+    "@type": "Product",
     name: lure.lure_name_ja,
     alternateName: lure.lure_name_en || undefined,
     description:
