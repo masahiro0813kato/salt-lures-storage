@@ -1,6 +1,7 @@
 "use client";
 
 import LureDetailImage from "./LureDetailImage";
+import { useTrackView } from "@/hooks/useTrackView";
 import type { LureWithRelations } from "@/types/database";
 
 interface LureDetailPanelProps {
@@ -170,6 +171,8 @@ function VerticalLayout({ lure }: { lure: LureWithRelations }) {
 }
 
 export default function LureDetailPanel({ lure, horizontal = false }: LureDetailPanelProps) {
+  useTrackView(lure.id);
+
   if (horizontal) {
     return <HorizontalLayout lure={lure} />;
   }

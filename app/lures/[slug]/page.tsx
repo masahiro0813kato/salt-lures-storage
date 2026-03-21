@@ -4,6 +4,7 @@ import LureDetailImage from "@/components/organisms/LureDetailImage";
 import ScrollReset from "@/components/organisms/ScrollReset";
 import { parseLureUrl } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
+import ViewTracker from "@/components/organisms/ViewTracker";
 import { createStaticClient } from "@/lib/supabase/static";
 
 // ISR設定: 1時間ごとに再生成
@@ -102,6 +103,9 @@ export default async function LureDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* 閲覧トラッキング */}
+      <ViewTracker lureId={lure.id} />
 
       {/* スクロール位置を0にリセット */}
       <ScrollReset />

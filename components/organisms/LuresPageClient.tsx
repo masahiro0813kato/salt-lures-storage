@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/organisms/Header";
 import SearchBar from "@/components/organisms/SearchBar";
@@ -20,6 +20,12 @@ function LuresContent() {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const isWideDesktop = useMediaQuery("(min-width: 1024px)");
   const [selectedLure, setSelectedLure] = useState<LureWithRelations | null>(null);
+  const isManualSelectRef = useRef(false);
+
+  const handleSelectLure = useCallback((lure: LureWithRelations) => {
+    isManualSelectRef.current = true;
+    setSelectedLure(lure);
+  }, []);
 
   const {
     lures,
@@ -33,29 +39,68 @@ function LuresContent() {
     pageSize: 20,
   });
 
-  // デスクトップ: 最初のルアーを自動選択
+  // 検索変更を追跡（auto-selectの制御に使用）
+  const prevSearchRef = useRef(search);
+  const searchChangedRef = useRef(false);
+
+  // 検索変更時に選択をリセット
   useEffect(() => {
-    if (isDesktop && lures.length > 0 && !selectedLure) {
+    if (prevSearchRef.current !== search) {
+      prevSearchRef.current = search;
+      searchChangedRef.current = true;
+      setSelectedLure(null);
+      if (isDesktop) {
+        const url = search ? `/lures?search=${search}` : "/lures";
+        window.history.replaceState(null, "", url);
+      }
+    }
+  }, [search, isDesktop]);
+
+  // デスクトップ: 自動選択（URLのselectedパラメータ or 最初のルアー）
+  useEffect(() => {
+    if (!isDesktop || selectedLure || lures.length === 0) return;
+
+    if (searchChangedRef.current) {
+      if (!isLoading) {
+        searchChangedRef.current = false;
+        // URLのselectedパラメータがあればそのルアーを選択
+        const selectedId = searchParams.get("selected");
+        if (selectedId) {
+          const found = lures.find((l) => l.id === parseInt(selectedId, 10));
+          if (found) {
+            setSelectedLure(found);
+            return;
+          }
+        }
+        setSelectedLure(lures[0]);
+      }
+    } else {
+      const selectedId = searchParams.get("selected");
+      if (selectedId) {
+        const found = lures.find((l) => l.id === parseInt(selectedId, 10));
+        if (found) {
+          setSelectedLure(found);
+          return;
+        }
+      }
       setSelectedLure(lures[0]);
     }
-  }, [isDesktop, lures, selectedLure]);
+  }, [isDesktop, lures, selectedLure, isLoading, searchParams]);
 
   // デスクトップ: 選択ルアー変更時にURLを同期
   useEffect(() => {
     if (isDesktop && selectedLure) {
-      const lureUrl = `/lures/${selectedLure.id}-${selectedLure.url_code}`;
-      window.history.replaceState(null, "", lureUrl);
+      if (search) {
+        // 検索中: 検索パラメータを維持しつつ選択IDを追加
+        const url = `/lures?search=${encodeURIComponent(search)}&selected=${selectedLure.id}`;
+        window.history.replaceState(null, "", url);
+      } else {
+        // 検索なし: ルアー詳細URLに変更
+        const lureUrl = `/lures/${selectedLure.id}-${selectedLure.url_code}`;
+        window.history.replaceState(null, "", lureUrl);
+      }
     }
-  }, [isDesktop, selectedLure]);
-
-  // 検索変更時に選択をリセットしURLを/luresに戻す
-  useEffect(() => {
-    setSelectedLure(null);
-    if (isDesktop) {
-      const url = search ? `/lures?search=${search}` : "/lures";
-      window.history.replaceState(null, "", url);
-    }
-  }, [search, isDesktop]);
+  }, [isDesktop, selectedLure, search]);
 
   // モバイル: スクロール位置の保存と復元
   useEffect(() => {
@@ -145,7 +190,7 @@ function LuresContent() {
               hasMore={hasMore}
               onLoadMore={loadMore}
               selectedLureId={selectedLure?.id}
-              onSelectLure={setSelectedLure}
+              onSelectLure={handleSelectLure}
               scrollContainerRef={leftPanelRef}
             />
           </div>

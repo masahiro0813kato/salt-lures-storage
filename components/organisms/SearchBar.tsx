@@ -102,13 +102,12 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   };
 
   const searchLures = useCallback(() => {
-    inputRef.current?.blur();
     const value = inputRef.current?.value || "";
+    inputRef.current?.blur();
     if (value.trim()) {
       addHistory(value.trim());
     }
     router.push(`/lures?search=${value}`);
-    // isShowはlatestSearchKey変更時に閉じる
   }, [router, addHistory]);
 
   // 履歴キーワードで検索

@@ -61,6 +61,15 @@
       sans-serif;
   }
 
+  /* 横スクロールバー非表示 */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   /* 既存デザインと同じ背景色 */
   html {
     background-color: #2a262f;
