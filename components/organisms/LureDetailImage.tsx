@@ -17,7 +17,7 @@ interface LureDetailImageProps {
   bgColors?: { colors: Array<{ baseRgb: [number, number, number]; weight: number }> } | null;
 }
 
-const DEFAULT_IMAGE = "/images/common/lure_main_default.png";
+const DEFAULT_IMAGE = "/images/common/lure_main_default.webp";
 
 export default function LureDetailImage({
   lureId,
