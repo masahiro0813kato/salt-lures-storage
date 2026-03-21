@@ -1,19 +1,25 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/organisms/Header";
 import SearchBar from "@/components/organisms/SearchBar";
 import StickyHeader, { StickyHeaderProvider } from "@/components/organisms/StickyHeader";
 import LureListVirtual from "@/components/organisms/LureListVirtual";
+import LureDetailPanel from "@/components/organisms/LureDetailPanel";
 import ScrollToTop from "@/components/organisms/ScrollToTop";
 import { useLuresInfinite } from "@/hooks/useLuresInfinite";
-import { useEffect, useRef } from "react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import type { LureWithRelations } from "@/types/database";
 
 function LuresContent() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
   const scrollRestoredRef = useRef(false);
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isWideDesktop = useMediaQuery("(min-width: 1024px)");
+  const [selectedLure, setSelectedLure] = useState<LureWithRelations | null>(null);
 
   const {
     lures,
@@ -27,12 +33,25 @@ function LuresContent() {
     pageSize: 20,
   });
 
-  // スクロール位置の保存と復元
+  // デスクトップ: 最初のルアーを自動選択
   useEffect(() => {
+    if (isDesktop && lures.length > 0 && !selectedLure) {
+      setSelectedLure(lures[0]);
+    }
+  }, [isDesktop, lures, selectedLure]);
+
+  // 検索変更時に選択をリセット
+  useEffect(() => {
+    setSelectedLure(null);
+  }, [search]);
+
+  // モバイル: スクロール位置の保存と復元
+  useEffect(() => {
+    if (isDesktop) return;
+
     const savedPosition = sessionStorage.getItem('luresScrollPosition');
     const savedSearch = sessionStorage.getItem('luresSearchKey');
 
-    // 検索条件が変わった場合は位置をクリア
     if (savedSearch !== search) {
       sessionStorage.removeItem('luresScrollPosition');
       sessionStorage.setItem('luresSearchKey', search);
@@ -41,38 +60,33 @@ function LuresContent() {
       return;
     }
 
-    // TanStack Queryがキャッシュからデータを即座に復元するので、
-    // luresが存在すれば即座にスクロール位置を復元できる
     if (savedPosition && lures.length > 0 && !scrollRestoredRef.current) {
       const scrollY = parseInt(savedPosition);
       scrollRestoredRef.current = true;
 
-      // 次のフレームでスクロール復元（DOMレンダリング完了を待つ）
       requestAnimationFrame(() => {
         window.scrollTo(0, scrollY);
         sessionStorage.removeItem('luresScrollPosition');
       });
     }
-  }, [lures.length, search]);
+  }, [lures.length, search, isDesktop]);
 
-  // スクロール位置の保存
+  // モバイル: スクロール位置の保存
   useEffect(() => {
+    if (isDesktop) return;
     if (lures.length === 0) return;
 
     let isNavigating = false;
 
     const saveScrollPosition = () => {
       if (isNavigating) return;
-
       if (lures.length > 0) {
         sessionStorage.setItem('luresScrollPosition', window.scrollY.toString());
       }
     };
 
-    // スクロール時に保存
     window.addEventListener('scroll', saveScrollPosition);
 
-    // リンククリック時に確実に保存
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a[href^="/lures/"]');
@@ -89,11 +103,11 @@ function LuresContent() {
       window.removeEventListener('scroll', saveScrollPosition);
       document.removeEventListener('click', handleClick, true);
     };
-  }, [lures.length]);
+  }, [lures.length, isDesktop]);
 
   return (
     <StickyHeaderProvider>
-      <StickyHeader>
+      <StickyHeader disableHide={isDesktop}>
         <Header />
         <SearchBar latestSearchKey={search} />
         {total > 0 && (
@@ -103,20 +117,54 @@ function LuresContent() {
         )}
       </StickyHeader>
 
-      <main className="pt-[200px] max-w-[420px] mx-auto">
-        <div className="px-4">
-          <LureListVirtual
-            lures={lures}
-            total={total}
-            isLoading={isLoading}
-            isFetchingMore={isFetchingMore}
-            hasMore={hasMore}
-            onLoadMore={loadMore}
-          />
-        </div>
-      </main>
+      {isDesktop ? (
+        /* デスクトップ: マスター・ディテールレイアウト */
+        <main className="fixed top-0 left-0 right-0 bottom-0 pt-[200px] flex">
+          {/* 左パネル: 一覧 */}
+          <div
+            ref={leftPanelRef}
+            className="w-[420px] min-w-[420px] overflow-y-auto px-4 pt-1"
+          >
+            <LureListVirtual
+              lures={lures}
+              total={total}
+              isLoading={isLoading}
+              isFetchingMore={isFetchingMore}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              selectedLureId={selectedLure?.id}
+              onSelectLure={setSelectedLure}
+              scrollContainerRef={leftPanelRef}
+            />
+          </div>
+          {/* 右パネル: 詳細 */}
+          <div className="flex-1 overflow-y-auto">
+            {selectedLure ? (
+              <LureDetailPanel key={selectedLure.id} lure={selectedLure} horizontal={isWideDesktop} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-text-secondary">
+                ルアーを選択してください
+              </div>
+            )}
+          </div>
+        </main>
+      ) : (
+        /* モバイル: 従来のレイアウト */
+        <main className="pt-[200px] max-w-[420px] mx-auto">
+          <div className="px-4">
+            <LureListVirtual
+              lures={lures}
+              total={total}
+              isLoading={isLoading}
+              isFetchingMore={isFetchingMore}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+            />
+          </div>
+        </main>
+      )}
 
-      <ScrollToTop />
+      {!isDesktop && <ScrollToTop />}
     </StickyHeaderProvider>
   );
 }

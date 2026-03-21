@@ -46,9 +46,10 @@ export function StickyHeaderProvider({ children }: StickyHeaderProviderProps) {
 
 interface StickyHeaderProps {
   children: ReactNode;
+  disableHide?: boolean;
 }
 
-export default function StickyHeader({ children }: StickyHeaderProps) {
+export default function StickyHeader({ children, disableHide = false }: StickyHeaderProps) {
   const { scrollDirection, isVisible: isScrollVisible } = useScrollDirection();
   const { isForceVisible, setForceVisible, isSearching } = useStickyHeader();
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -74,7 +75,7 @@ export default function StickyHeader({ children }: StickyHeaderProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY, isForceVisible, isSearching, setForceVisible]);
 
-  const isVisible = isForceVisible || isScrollVisible;
+  const isVisible = disableHide || isForceVisible || isScrollVisible;
 
   return (
     <div

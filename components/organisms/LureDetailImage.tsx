@@ -34,7 +34,7 @@ export default function LureDetailImage({
   };
 
   return (
-    <section className="relative w-full flex justify-center overflow-hidden" style={{ height: '400px', minHeight: '400px' }}>
+    <section className="relative w-full flex justify-center overflow-hidden" style={{ height: '400px', minHeight: '300px' }}>
       {/* 背景（Canvas） - デフォルト画像の場合は白背景のみ */}
       <LureDetailBackground
         imageUrl={isDefaultImage ? null : supabaseImageUrl}
