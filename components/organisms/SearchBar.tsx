@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useStickyHeader } from "./StickyHeader";
+import { useSearchHistory } from "@/hooks/useSearchHistory";
 
 interface SuggestLure {
   id: number;
@@ -29,6 +30,10 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   const suggestListRef = useRef<HTMLElement>(null);
   const isComposingRef = useRef(false);
   const { setForceVisible, setIsSearching } = useStickyHeader();
+  const { history, addHistory, removeHistory, clearHistory } = useSearchHistory();
+
+  // 入力中かどうか（履歴とサジェストの表示切替に使用）
+  const hasInput = searchKey.length > 0;
 
   // 検索UI表示時の処理
   useEffect(() => {
@@ -48,7 +53,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
     };
   }, [isShow, setForceVisible, setIsSearching]);
 
-  // キーボード外でのアクション検知（クリック、タッチ、スクロール）
+  // キーボード外でのアクション検知
   useEffect(() => {
     if (!isShow) return;
 
@@ -100,8 +105,21 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
     setIsShow(false);
     inputRef.current?.blur();
     const value = inputRef.current?.value || "";
+    if (value.trim()) {
+      addHistory(value.trim());
+    }
     router.push(`/lures?search=${value}`);
-  }, [router]);
+  }, [router, addHistory]);
+
+  // 履歴キーワードで検索
+  const searchFromHistory = useCallback((keyword: string) => {
+    setSearchKey(keyword);
+    if (inputRef.current) inputRef.current.value = keyword;
+    setIsShow(false);
+    inputRef.current?.blur();
+    addHistory(keyword);
+    router.push(`/lures?search=${keyword}`);
+  }, [router, addHistory]);
 
   const updateFromInput = useCallback(() => {
     const value = inputRef.current?.value || "";
@@ -110,18 +128,17 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
       setIsShow(true);
       getSuggestLures(value);
     } else {
-      setIsShow(false);
+      // 入力が空になったら履歴表示のためisShowは維持
       setSuggestLures([]);
     }
   }, []);
 
-  // ネイティブイベントで入力を処理（React onChangeのIME問題を回避）
+  // ネイティブイベントで入力を処理
   useEffect(() => {
     const input = inputRef.current;
     if (!input) return;
 
     const onInput = () => {
-      // IME変換中はサジェスト更新をスキップ
       if (isComposingRef.current) return;
       updateFromInput();
     };
@@ -225,30 +242,90 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
           className="w-full bg-bg-primary absolute transition-opacity duration-200 overflow-y-auto pointer-events-auto z-[1500]"
           style={{ height: "calc(100vh - 144px)" }}
         >
-          <p className="text-white px-4 py-2">検索</p>
-          <ul>
-            {suggestLures.map((item) => (
-              <li key={item.id} className="text-white">
-                <Link
-                  href={`/lures/${item.id}-${item.url_code}`}
-                  className="flex items-end gap-2 px-4 py-4 border-b-[0.5px] border-text-tertiary bg-no-repeat bg-[right_1rem_center] hover:bg-bg-secondary active:bg-bg-secondary"
-                  style={{
-                    backgroundImage:
-                      "url('/images/common/icon-arrow-right.svg')",
-                  }}
-                  onClick={() => {
-                    setIsShow(false);
-                    inputRef.current?.blur();
-                  }}
-                >
-                  <div className="text-xs text-text-tertiary">
-                    {item.lure_maker?.lure_maker_name_en}
+          {hasInput ? (
+            /* キーワード入力中: サジェスト表示 */
+            <>
+              <p className="text-white px-4 py-2">検索</p>
+              <ul>
+                {suggestLures.map((item) => (
+                  <li key={item.id} className="text-white">
+                    <Link
+                      href={`/lures/${item.id}-${item.url_code}`}
+                      className="flex items-end gap-2 px-4 py-4 border-b-[0.5px] border-text-tertiary bg-no-repeat bg-[right_1rem_center] hover:bg-bg-secondary active:bg-bg-secondary"
+                      style={{
+                        backgroundImage:
+                          "url('/images/common/icon-arrow-right.svg')",
+                      }}
+                      onClick={() => {
+                        setIsShow(false);
+                        inputRef.current?.blur();
+                      }}
+                    >
+                      <div className="text-xs text-text-tertiary">
+                        {item.lure_maker?.lure_maker_name_en}
+                      </div>
+                      <div className="text-base">{item.lure_name_ja}</div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            /* 入力なし: 検索履歴表示 */
+            <>
+              {history.length > 0 && (
+                <>
+                  <div className="flex items-center justify-between px-4 py-2">
+                    <p className="text-text-secondary text-sm">検索履歴</p>
+                    <button
+                      onClick={clearHistory}
+                      className="text-text-tertiary text-xs hover:text-white transition-colors"
+                    >
+                      すべて削除
+                    </button>
                   </div>
-                  <div className="text-base">{item.lure_name_ja}</div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                  <ul>
+                    {history.map((keyword) => (
+                      <li key={keyword} className="text-white">
+                        <div className="flex items-center border-b-[0.5px] border-text-tertiary">
+                          <button
+                            onClick={() => searchFromHistory(keyword)}
+                            className="flex-1 flex items-center gap-3 px-4 py-4 text-left hover:bg-bg-secondary active:bg-bg-secondary"
+                          >
+                            <Image
+                              src="/images/common/icon-history.svg"
+                              alt=""
+                              width={20}
+                              height={20}
+                            />
+                            <span className="text-base">{keyword}</span>
+                          </button>
+                          <button
+                            onClick={() => removeHistory(keyword)}
+                            className="px-4 py-4 text-text-tertiary hover:text-white transition-colors"
+                            aria-label={`${keyword}を削除`}
+                          >
+                            <Image
+                              src="/images/common/icon-searchClose.svg"
+                              alt="削除"
+                              width={24}
+                              height={24}
+                              className="opacity-50"
+                            />
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {history.length === 0 && (
+                <p className="text-text-tertiary text-sm px-4 py-8 text-center">
+                  検索履歴はありません
+                </p>
+              )}
+            </>
+          )}
         </section>
       )}
     </div>
