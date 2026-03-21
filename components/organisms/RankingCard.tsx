@@ -12,6 +12,7 @@ interface RankingCardProps {
   makerName: string;
   lureImageId: string;
   viewCount: number;
+  priority?: boolean;
 }
 
 export default function RankingCard({
@@ -22,6 +23,7 @@ export default function RankingCard({
   makerName,
   lureImageId,
   viewCount,
+  priority = false,
 }: RankingCardProps) {
   const originalImageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lureImageId}_thumb.png`;
   const defaultImageUrl = "/images/common/lure_tmb_default.webp";
@@ -41,7 +43,9 @@ export default function RankingCard({
           height={100}
           className="object-cover"
           style={{ width: '140px', height: 'auto' }}
-          unoptimized
+          priority={priority}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
           onError={() => setImageSrc(defaultImageUrl)}
         />
         {/* 順位バッジ */}

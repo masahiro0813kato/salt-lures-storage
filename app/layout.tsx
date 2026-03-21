@@ -70,7 +70,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
-        <link rel="preconnect" href="https://acnvuvzuswsyrbczxzko.supabase.co" />
+        <link rel="preconnect" href="https://acnvuvzuswsyrbczxzko.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://acnvuvzuswsyrbczxzko.supabase.co" />
       </head>
       {/* ▼ 追加: GTMコンポーネント (bodyタグの前に配置するのが一般的です) */}

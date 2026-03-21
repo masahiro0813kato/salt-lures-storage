@@ -55,7 +55,7 @@ export default function RankingSection({ title, period }: RankingSectionProps) {
         </div>
       ) : (
         <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
-          {rankings.map((item) => (
+          {rankings.map((item, index) => (
             <RankingCard
               key={item.lure_id}
               rank={item.rank}
@@ -65,6 +65,7 @@ export default function RankingSection({ title, period }: RankingSectionProps) {
               makerName={item.lure_maker_name_en || ""}
               lureImageId={item.lure_image_id}
               viewCount={item.view_count}
+              priority={index < 3}
             />
           ))}
         </div>
