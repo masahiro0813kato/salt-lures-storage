@@ -65,8 +65,9 @@ export default async function LureDetailPage({
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: lure.lure_name_ja + "| Salt Lure Storage",
+    "@type": "Thing",
+    name: lure.lure_name_ja,
+    alternateName: lure.lure_name_en || undefined,
     description:
       lure.lure_information ||
       `${lure.lure_maker?.lure_maker_name_ja} ${lure.lure_name_ja}`,
