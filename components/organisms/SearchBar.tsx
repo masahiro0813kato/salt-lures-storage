@@ -102,24 +102,33 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   };
 
   const searchLures = useCallback(() => {
-    setIsShow(false);
     inputRef.current?.blur();
     const value = inputRef.current?.value || "";
     if (value.trim()) {
       addHistory(value.trim());
     }
     router.push(`/lures?search=${value}`);
+    // isShowはlatestSearchKey変更時に閉じる
   }, [router, addHistory]);
 
   // 履歴キーワードで検索
   const searchFromHistory = useCallback((keyword: string) => {
     setSearchKey(keyword);
     if (inputRef.current) inputRef.current.value = keyword;
-    setIsShow(false);
     inputRef.current?.blur();
     addHistory(keyword);
     router.push(`/lures?search=${keyword}`);
   }, [router, addHistory]);
+
+  // 検索結果が切り替わったらサジェストUIを閉じる
+  const prevSearchKeyRef = useRef(latestSearchKey);
+  useEffect(() => {
+    if (prevSearchKeyRef.current !== latestSearchKey) {
+      prevSearchKeyRef.current = latestSearchKey;
+      setIsShow(false);
+      setSuggestLures([]);
+    }
+  }, [latestSearchKey]);
 
   const updateFromInput = useCallback(() => {
     const value = inputRef.current?.value || "";
