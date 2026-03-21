@@ -77,6 +77,7 @@ export default async function LureDetailPage({
       name:
         lure.lure_maker?.lure_maker_name_ja ||
         lure.lure_maker?.lure_maker_name_en,
+      alternateName: lure.lure_maker?.lure_maker_name_en || undefined,
     },
     additionalProperty: [
       lure.lure_length && {
