@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
 
-  // lure_id自動生成（メーカー名-連番形式）
+  // lure_idが未入力の場合は自動生成
   if (!body.lure_id) {
     const timestamp = Date.now().toString(36);
     const random = Math.random().toString(36).substring(2, 6);

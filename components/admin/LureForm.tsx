@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import ImageDropZone from "./ImageDropZone";
 
 interface Maker {
   id: number;
@@ -14,6 +15,7 @@ interface Category {
 }
 
 interface LureFormData {
+  lure_id: string;
   lure_name_ja: string;
   lure_name_en: string;
   lure_maker_id: number | null;
@@ -40,10 +42,12 @@ interface LureFormData {
 interface LureFormProps {
   initialData?: Partial<LureFormData>;
   lureId?: number;
+  lureIdStr?: string; // lure_id文字列（画像アップロード用）
   isEdit?: boolean;
 }
 
 const defaultData: LureFormData = {
+  lure_id: "",
   lure_name_ja: "",
   lure_name_en: "",
   lure_maker_id: null,
@@ -67,7 +71,7 @@ const defaultData: LureFormData = {
   is_available: true,
 };
 
-export default function LureForm({ initialData, lureId, isEdit = false }: LureFormProps) {
+export default function LureForm({ initialData, lureId, lureIdStr, isEdit = false }: LureFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<LureFormData>({ ...defaultData, ...initialData });
   const [makers, setMakers] = useState<Maker[]>([]);
@@ -150,6 +154,21 @@ export default function LureForm({ initialData, lureId, isEdit = false }: LureFo
         <div>
           <h3 className="text-lg font-medium text-gray-900 mb-4">基本情報</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                ルアーID<span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="lure_id"
+                value={form.lure_id}
+                onChange={handleChange}
+                placeholder="例: ima-55"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+              <div className="text-xs text-gray-400 mt-1">画像ファイル名に使用されます。変更すると画像の参照が切れます。</div>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 ルアー名（日本語）<span className="text-red-500">*</span>
@@ -296,6 +315,27 @@ export default function LureForm({ initialData, lureId, isEdit = false }: LureFo
             </div>
           </div>
         </div>
+
+        {/* 画像 */}
+        {(form.lure_id || lureIdStr) && (
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">画像</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ImageDropZone
+                label="メイン画像"
+                type="main"
+                lureId={form.lure_id || lureIdStr || ""}
+                currentImageUrl={isEdit ? `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/${lureIdStr}_main.png` : undefined}
+              />
+              <ImageDropZone
+                label="サムネイル画像"
+                type="thumb"
+                lureId={form.lure_id || lureIdStr || ""}
+                currentImageUrl={isEdit ? `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lureIdStr}_thumb.png` : undefined}
+              />
+            </div>
+          </div>
+        )}
 
         {/* 説明・参照URL */}
         <div>

@@ -44,6 +44,7 @@ export default function AdminLureEditPage() {
       <h2 className="text-2xl font-bold text-gray-900 mb-6">ルアー編集</h2>
       <LureForm
         initialData={{
+          lure_id: (lure.lure_id as string) || "",
           lure_name_ja: (lure.lure_name_ja as string) || "",
           lure_name_en: (lure.lure_name_en as string) || "",
           lure_maker_id: (lure.lure_maker_id as number) || null,
@@ -67,6 +68,7 @@ export default function AdminLureEditPage() {
           is_available: (lure.is_available as boolean) ?? true,
         }}
         lureId={parseInt(id, 10)}
+        lureIdStr={(lure.lure_id as string) || ""}
         isEdit
       />
     </div>
