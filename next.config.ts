@@ -14,14 +14,13 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: ['lucide-react', 'three'],
   },
   turbopack: {},
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   compress: true,
-  productionBrowserSourceMaps: true,
 };
 
 export default nextConfig;

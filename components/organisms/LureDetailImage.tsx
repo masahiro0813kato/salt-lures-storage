@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import LureDetailBackground from "./LureDetailBackground";
+import dynamic from "next/dynamic";
 import { generateBlurDataURL } from "@/lib/imageUtils";
+
+const LureDetailBackground = dynamic(
+  () => import("./LureDetailBackground"),
+  { ssr: false }
+);
 
 interface LureDetailImageProps {
   lureId: string;
