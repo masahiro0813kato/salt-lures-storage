@@ -60,52 +60,8 @@ export default async function LureDetailPage({
     notFound();
   }
 
-  // 構造化データ（JSON-LD）
-  const imageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/${lure.lure_id}_main.png`;
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: lure.lure_name_ja,
-    alternateName: lure.lure_name_en || undefined,
-    description:
-      lure.lure_information ||
-      `${lure.lure_maker?.lure_maker_name_ja} ${lure.lure_name_ja}`,
-    image: imageUrl,
-    brand: {
-      "@type": "Brand",
-      name:
-        lure.lure_maker?.lure_maker_name_ja ||
-        lure.lure_maker?.lure_maker_name_en,
-      alternateName: lure.lure_maker?.lure_maker_name_en || undefined,
-    },
-    additionalProperty: [
-      lure.lure_length && {
-        "@type": "PropertyValue",
-        name: "全長",
-        value: `${lure.lure_length}mm`,
-      },
-      lure.lure_weight && {
-        "@type": "PropertyValue",
-        name: "重量",
-        value: `${lure.lure_weight}g`,
-      },
-      lure.attached_hook_size_1 && {
-        "@type": "PropertyValue",
-        name: "フックサイズ",
-        value: lure.attached_hook_size_1,
-      },
-    ].filter(Boolean),
-  };
-
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      {/* 構造化データ */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
       {/* 閲覧トラッキング */}
       <ViewTracker lureId={lure.id} />
 
