@@ -98,7 +98,7 @@ function SpecSection({ lure }: { lure: LureWithRelations }) {
 }
 
 // 1024px以上: 横並びレイアウト
-function HorizontalLayout({ lure }: { lure: LureWithRelations }) {
+function HorizontalLayout({ lure }: { lure: LureWithRelations; }) {
   return (
     <div className="h-full flex bg-bg-primary text-white">
       {/* 左: 画像 + タイトル */}
@@ -106,6 +106,7 @@ function HorizontalLayout({ lure }: { lure: LureWithRelations }) {
         <LureDetailImage
           lureId={lure.lure_id}
           lureName={lure.lure_name_ja}
+          bgColors={lure.bg_colors}
         />
         <div className="px-6 py-4">
           <div className="text-lg leading-none mb-3">

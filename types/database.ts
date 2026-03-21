@@ -57,6 +57,12 @@ export interface Lure {
   target_fish_4: string | null;
   target_fish_5: string | null;
   lure_information: string | null;
+  bg_colors: {
+    colors: Array<{
+      baseRgb: [number, number, number];
+      weight: number;
+    }>;
+  } | null;
   view_count: number;
   data_version: number;
   is_available: boolean;

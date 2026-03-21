@@ -10,12 +10,14 @@ interface LureDetailBackgroundProps {
   imageUrl: string | null | undefined;
   blur?: number;
   showDebugUI?: boolean;
+  bgColors?: { colors: Array<{ baseRgb: [number, number, number]; weight: number }> } | null;
 }
 
 export default function LureDetailBackground({
   imageUrl,
   blur = 0.289,
   showDebugUI = false,
+  bgColors,
 }: LureDetailBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -31,7 +33,7 @@ export default function LureDetailBackground({
       ]
     : [0.7, 1.5, 1.5, 0.7];
 
-  const { palette, isLoading, error } = useColorExtraction(imageUrl || null, undefined, weightMultipliers);
+  const { palette, isLoading, error } = useColorExtraction(imageUrl || null, undefined, weightMultipliers, bgColors);
 
   // 親要素のサイズを監視
   useEffect(() => {

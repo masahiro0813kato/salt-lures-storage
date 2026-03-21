@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { isDefaultImage } from '@/constants/images';
 import { rgbToHsl, hslToRgb } from '@/lib/colorUtils';
 import { ColorExtractionParams } from '@/types/shader';
@@ -26,16 +26,32 @@ const DEFAULT_PARAMS: ColorExtractionParams = {
 export function useColorExtraction(
   imageUrl: string | null,
   params: ColorExtractionParams = DEFAULT_PARAMS,
-  weightMultipliers: [number, number, number, number] = [0.7, 1.5, 1.5, 0.7]
+  weightMultipliers: [number, number, number, number] = [0.7, 1.5, 1.5, 0.7],
+  preloadedColors?: { colors: Array<{ baseRgb: [number, number, number]; weight: number }> } | null
 ): UseColorExtractionResult {
   const [palette, setPalette] = useState<ExtractedColor[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // DB保存済みの色データがある場合のパレットを計算
+  const dbPalette = useMemo(() => {
+    if (!preloadedColors?.colors) return null;
+    return preloadedColors.colors.map((c) => ({
+      baseRgb: c.baseRgb,
+      weight: c.weight,
+      score: 0,
+      isNeutral: false,
+    }));
+    // preloadedColorsはオブジェクトなので中身で比較
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preloadedColors?.colors?.length]);
+
   useEffect(() => {
-    // デフォルト画像チェック - 即座にnullを返す
+    // DB色データがある場合はスキップ
+    if (dbPalette) return;
+
+    // デフォルト画像チェック
     if (isDefaultImage(imageUrl)) {
-      console.log('⏭️ Skipping color extraction: default image');
       setPalette(null);
       setIsLoading(false);
       setError(null);
@@ -43,7 +59,6 @@ export function useColorExtraction(
     }
 
     if (!imageUrl) {
-      console.log('⏭️ Skipping color extraction: no image URL');
       setPalette(null);
       setIsLoading(false);
       setError(null);
@@ -393,7 +408,13 @@ export function useColorExtraction(
     };
 
     extractColors();
-  }, [imageUrl, params.minLightness, params.muddyThreshold, params.accentThreshold, weightMultipliers]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imageUrl, params.minLightness, params.muddyThreshold, params.accentThreshold]);
+
+  // DB色データがあればそちらを優先
+  if (dbPalette) {
+    return { palette: dbPalette, isLoading: false, error: null };
+  }
 
   return { palette, isLoading, error };
 }

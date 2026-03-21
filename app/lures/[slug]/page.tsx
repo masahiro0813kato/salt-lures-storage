@@ -113,6 +113,7 @@ export default async function LureDetailPage({
           lureId={lure.lure_id}
           lureName={lure.lure_name_ja}
           showDebugUI={process.env.NEXT_PUBLIC_SHOW_DEBUG_UI === 'true'}
+          bgColors={lure.bg_colors}
         />
 
         {/* データセクション */}

@@ -9,6 +9,7 @@ interface LureDetailImageProps {
   lureId: string;
   lureName: string;
   showDebugUI?: boolean;
+  bgColors?: { colors: Array<{ baseRgb: [number, number, number]; weight: number }> } | null;
 }
 
 const DEFAULT_IMAGE = "/images/common/lure_main_default.png";
@@ -17,6 +18,7 @@ export default function LureDetailImage({
   lureId,
   lureName,
   showDebugUI = false,
+  bgColors,
 }: LureDetailImageProps) {
   const supabaseImageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/${lureId}_main.png`;
   const [imageSrc, setImageSrc] = useState(supabaseImageUrl);
@@ -39,6 +41,7 @@ export default function LureDetailImage({
       <LureDetailBackground
         imageUrl={isDefaultImage ? null : supabaseImageUrl}
         showDebugUI={showDebugUI}
+        bgColors={isDefaultImage ? null : bgColors}
       />
 
       {/* メイン画像 */}
