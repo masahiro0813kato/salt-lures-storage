@@ -30,10 +30,10 @@ export default function RankingCard({
   return (
     <Link
       href={`/lures/${lureId}-${urlCode}`}
-      className="block min-w-[160px] w-[160px] rounded-lg overflow-hidden bg-white hover:scale-105 transition-transform duration-200"
+      className="block min-w-[160px] w-[160px] rounded-lg bg-white hover:scale-105 transition-transform duration-200"
     >
       {/* 画像エリア */}
-      <div className="relative w-full h-[120px] bg-white flex items-center justify-end">
+      <div className="relative w-full h-[120px] bg-white flex items-center justify-end rounded-t-lg overflow-hidden">
         <Image
           src={imageSrc}
           alt={lureName}

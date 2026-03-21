@@ -97,7 +97,7 @@ export default async function LureDetailPage({
   };
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen pb-20 md:pb-0">
       {/* 構造化データ */}
       <script
         type="application/ld+json"
