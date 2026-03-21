@@ -40,10 +40,22 @@ function LuresContent() {
     }
   }, [isDesktop, lures, selectedLure]);
 
-  // 検索変更時に選択をリセット
+  // デスクトップ: 選択ルアー変更時にURLを同期
+  useEffect(() => {
+    if (isDesktop && selectedLure) {
+      const lureUrl = `/lures/${selectedLure.id}-${selectedLure.url_code}`;
+      window.history.replaceState(null, "", lureUrl);
+    }
+  }, [isDesktop, selectedLure]);
+
+  // 検索変更時に選択をリセットしURLを/luresに戻す
   useEffect(() => {
     setSelectedLure(null);
-  }, [search]);
+    if (isDesktop) {
+      const url = search ? `/lures?search=${search}` : "/lures";
+      window.history.replaceState(null, "", url);
+    }
+  }, [search, isDesktop]);
 
   // モバイル: スクロール位置の保存と復元
   useEffect(() => {
