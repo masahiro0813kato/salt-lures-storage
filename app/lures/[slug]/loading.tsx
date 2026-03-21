@@ -1,12 +1,12 @@
-import Header from "@/components/organisms/Header";
+import DetailPageHeader from "@/components/organisms/DetailPageHeader";
 
 export default function Loading() {
   return (
-    <div className="bg-white min-h-screen">
-      <Header fixed={true} />
-      <main className="relative">
+    <div className="min-h-screen pb-20 md:pb-0">
+      <DetailPageHeader />
+      <main className="relative pt-[140px]">
         {/* 画像セクション スケルトン */}
-        <section className="relative w-full flex justify-center overflow-hidden bg-gray-200 animate-pulse" style={{ height: '400px', minHeight: '400px' }}>
+        <section className="relative w-full flex justify-center overflow-hidden bg-gray-200 animate-pulse" style={{ height: '400px', minHeight: '300px' }}>
           <div className="w-4/5 h-full bg-gray-300"></div>
         </section>
 
@@ -21,20 +21,17 @@ export default function Loading() {
 
           {/* スペックエリア スケルトン */}
           <div className="border-y-[0.5px] border-text-tertiary py-8 mb-8">
-            {/* カテゴリー */}
             <div className="mb-8">
               <div className="h-4 w-20 bg-bg-secondary rounded mb-1 animate-pulse"></div>
               <div className="h-6 w-48 bg-bg-secondary rounded mb-1 animate-pulse"></div>
               <div className="h-4 w-32 bg-bg-secondary rounded animate-pulse"></div>
             </div>
 
-            {/* フックサイズ */}
             <div className="mb-8">
               <div className="h-4 w-24 bg-bg-secondary rounded mb-1 animate-pulse"></div>
               <div className="h-5 w-40 bg-bg-secondary rounded animate-pulse"></div>
             </div>
 
-            {/* その他のスペック */}
             <div className="grid grid-cols-3 gap-x-4 gap-y-8">
               <div>
                 <div className="h-4 w-20 bg-bg-secondary rounded mb-1 animate-pulse"></div>

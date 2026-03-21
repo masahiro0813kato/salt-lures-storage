@@ -105,6 +105,7 @@ function WindowVirtualList({
     count: lures.length,
     estimateSize: () => 140,
     overscan: 5,
+    measureElement: (element) => element?.getBoundingClientRect().height ?? 140,
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
@@ -135,6 +136,7 @@ function WindowVirtualList({
             <div
               key={virtualItem.key}
               data-index={virtualItem.index}
+              ref={rowVirtualizer.measureElement}
               style={{
                 position: "absolute",
                 top: 0,
@@ -176,6 +178,7 @@ function ContainerVirtualList({
     getScrollElement: () => scrollContainerRef.current,
     estimateSize: () => 140,
     overscan: 5,
+    measureElement: (element) => element?.getBoundingClientRect().height ?? 140,
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
@@ -206,6 +209,7 @@ function ContainerVirtualList({
             <div
               key={virtualItem.key}
               data-index={virtualItem.index}
+              ref={rowVirtualizer.measureElement}
               style={{
                 position: "absolute",
                 top: 0,
