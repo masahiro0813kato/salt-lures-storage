@@ -5,6 +5,5 @@ Allow: /
 # Sitemap location
 Sitemap: https://salt-lure-storage.com/sitemap.xml
 
-# Disallow admin or private paths if any
-# User-agent: *
-# Disallow: /admin/
+# Disallow admin paths
+Disallow: /admin/
