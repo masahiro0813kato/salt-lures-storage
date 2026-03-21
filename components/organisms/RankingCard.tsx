@@ -58,9 +58,9 @@ export default function RankingCard({
         <div className="text-sm text-dark font-medium leading-tight line-clamp-2">
           {lureName}
         </div>
-        <div className="text-xs text-text-tertiary mt-1">
+        {/* <div className="text-xs text-text-tertiary mt-1">
           {viewCount} views
-        </div>
+        </div> */}
       </div>
     </Link>
   );
