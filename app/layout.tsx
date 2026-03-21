@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ReactQueryProvider } from "@/components/providers/ReactQueryProvider";
 import MobileFooter from "@/components/organisms/MobileFooter";
-// ▼ 追加: GTMのインポート
-import { GoogleTagManager } from "@next/third-parties/google";
+import LazyGTM from "@/components/organisms/LazyGTM";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://salt-lure-storage.com";
 
@@ -73,10 +72,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://acnvuvzuswsyrbczxzko.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://acnvuvzuswsyrbczxzko.supabase.co" />
       </head>
-      {/* ▼ 追加: GTMコンポーネント (bodyタグの前に配置するのが一般的です) */}
-      <GoogleTagManager gtmId="GTM-M2P73Z58" />
-
       <body className="antialiased" suppressHydrationWarning>
+        <LazyGTM gtmId="GTM-M2P73Z58" />
         <ReactQueryProvider>
           {children}
           <MobileFooter />
