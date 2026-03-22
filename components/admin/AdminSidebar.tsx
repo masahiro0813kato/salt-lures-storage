@@ -22,6 +22,7 @@ export default function AdminSidebar({ userEmail }: AdminSidebarProps) {
   const navItems = [
     { href: "/admin", label: "ダッシュボード" },
     { href: "/admin/lures", label: "ルアー管理" },
+    { href: "/admin/analytics", label: "閲覧ランキング" },
   ];
 
   return (

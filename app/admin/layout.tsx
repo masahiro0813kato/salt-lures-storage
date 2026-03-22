@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export const metadata: Metadata = {
+  title: {
+    default: "管理画面 | SLS",
+    template: "%s | SLS 管理画面",
+  },
   robots: { index: false, follow: false },
 };
 
