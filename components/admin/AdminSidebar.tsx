@@ -23,6 +23,7 @@ export default function AdminSidebar({ userEmail }: AdminSidebarProps) {
     { href: "/admin", label: "ダッシュボード" },
     { href: "/admin/lures", label: "ルアー管理" },
     { href: "/admin/analytics", label: "閲覧ランキング" },
+    { href: "/admin/quality", label: "データ品質" },
   ];
 
   return (
