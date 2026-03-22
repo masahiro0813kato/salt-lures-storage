@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import DailyViewsChart from "@/components/admin/DailyViewsChart";
 
 interface RankingItem {
   rank: number;
@@ -72,6 +73,9 @@ export default function AdminAnalyticsPage() {
           <div className="text-3xl font-bold text-gray-900">{summary.total.toLocaleString()}</div>
         </div>
       </div>
+
+      {/* 閲覧数推移グラフ */}
+      <DailyViewsChart />
 
       {/* 期間切替・表示件数 */}
       <div className="flex flex-wrap items-center gap-4 mb-4">
