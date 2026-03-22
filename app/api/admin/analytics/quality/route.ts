@@ -27,9 +27,9 @@ export async function GET() {
   // スペック未入力ルアー（フックサイズまたは重さが未入力）
   const { data: noSpecs } = await supabase
     .from("lures")
-    .select("id, lure_name_ja, lure_id, attached_hook_size_1, lure_weight, lure_length, lure_maker:lure_makers(lure_maker_name_ja)")
+    .select("id, lure_name_ja, lure_id, attached_hook_size_1, attached_ring_size, lure_weight, lure_length, lure_maker:lure_makers(lure_maker_name_ja)")
     .eq("is_available", true)
-    .or("attached_hook_size_1.is.null,lure_weight.is.null,lure_length.is.null")
+    .or("attached_hook_size_1.is.null,attached_ring_size.is.null,lure_weight.is.null,lure_length.is.null")
     .order("lure_name_ja");
 
   return NextResponse.json({
@@ -39,6 +39,7 @@ export async function GET() {
       ...l,
       missing: [
         !l.attached_hook_size_1 && "フックサイズ",
+        !l.attached_ring_size && "リングサイズ",
         !l.lure_weight && "重さ",
         !l.lure_length && "長さ",
       ].filter(Boolean),
