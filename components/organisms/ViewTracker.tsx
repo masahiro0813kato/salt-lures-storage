@@ -2,7 +2,13 @@
 
 import { useTrackView } from "@/hooks/useTrackView";
 
-export default function ViewTracker({ lureId }: { lureId: number }) {
-  useTrackView(lureId);
+interface ViewTrackerProps {
+  lureId: number;
+  lureName?: string;
+  makerName?: string;
+}
+
+export default function ViewTracker({ lureId, lureName, makerName }: ViewTrackerProps) {
+  useTrackView(lureId, { lureName, makerName });
   return null;
 }

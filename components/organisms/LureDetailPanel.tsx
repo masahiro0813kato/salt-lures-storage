@@ -189,7 +189,10 @@ function VerticalLayout({ lure, onSelectLure }: { lure: LureWithRelations; onSel
 }
 
 export default function LureDetailPanel({ lure, horizontal = false, onSelectLure }: LureDetailPanelProps) {
-  useTrackView(lure.id);
+  useTrackView(lure.id, {
+    lureName: lure.lure_name_ja,
+    makerName: lure.lure_maker?.lure_maker_name_en || "",
+  });
 
   if (horizontal) {
     return <HorizontalLayout lure={lure} onSelectLure={onSelectLure} />;

@@ -63,7 +63,7 @@ export default async function LureDetailPage({
   return (
     <div className="min-h-screen pb-20 md:pb-0">
       {/* 閲覧トラッキング */}
-      <ViewTracker lureId={lure.id} />
+      <ViewTracker lureId={lure.id} lureName={lure.lure_name_ja} makerName={lure.lure_maker?.lure_maker_name_en} />
 
       {/* スクロール位置を0にリセット */}
       <ScrollReset />
