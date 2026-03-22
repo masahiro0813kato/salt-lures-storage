@@ -9,8 +9,13 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
+  const categoryName = searchParams.get("category");
   const period = searchParams.get("period") || "monthly";
   const limit = parseInt(searchParams.get("limit") || "10", 10);
+
+  if (!categoryName) {
+    return NextResponse.json({ error: "category is required" }, { status: 400 });
+  }
 
   const now = new Date();
   let since: Date;
@@ -40,24 +45,16 @@ export async function GET(request: NextRequest) {
       since.setDate(since.getDate() - 30);
   }
 
-  const [makersRes, seriesRes, categoriesRes] = await Promise.all([
-    supabase.rpc("get_maker_rankings", {
-      since_date: since.toISOString(),
-      result_limit: limit,
-    }),
-    supabase.rpc("get_series_rankings", {
-      since_date: since.toISOString(),
-      result_limit: limit,
-    }),
-    supabase.rpc("get_category_rankings", {
-      since_date: since.toISOString(),
-      result_limit: limit,
-    }),
-  ]);
-
-  return NextResponse.json({
-    makers: makersRes.data || [],
-    series: seriesRes.data || [],
-    categories: categoriesRes.data || [],
+  const { data, error } = await supabase.rpc("get_lure_rankings_by_category", {
+    category_name_param: categoryName,
+    since_date: since.toISOString(),
+    result_limit: limit,
   });
+
+  if (error) {
+    console.error("Category lures error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ lures: data || [] });
 }
