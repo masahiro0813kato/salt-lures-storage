@@ -6,6 +6,7 @@ import ViewTracker from "@/components/organisms/ViewTracker";
 import PageHeader from "@/components/organisms/PageHeader";
 import SeriesSection from "@/components/organisms/SeriesSection";
 import { createStaticClient } from "@/lib/supabase/static";
+import { generateBreadcrumbJsonLd, lureBreadcrumb } from "@/lib/breadcrumb";
 
 // ISR設定: 1時間ごとに再生成
 export const revalidate = 3600;
@@ -62,6 +63,18 @@ export default async function LureDetailPage({
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
+      {/* パンくずリスト構造化データ */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            generateBreadcrumbJsonLd(
+              lureBreadcrumb(lure.lure_name_ja, `${parsed.id}-${parsed.code}`)
+            )
+          ),
+        }}
+      />
+
       {/* 閲覧トラッキング */}
       <ViewTracker lureId={lure.id} lureName={lure.lure_name_ja} makerName={lure.lure_maker?.lure_maker_name_en} />
 
