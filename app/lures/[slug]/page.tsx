@@ -3,7 +3,7 @@ import LureDetailImage from "@/components/organisms/LureDetailImage";
 import ScrollReset from "@/components/organisms/ScrollReset";
 import { parseLureUrl } from "@/lib/utils";
 import ViewTracker from "@/components/organisms/ViewTracker";
-import DetailPageHeader from "@/components/organisms/DetailPageHeader";
+import PageHeader from "@/components/organisms/PageHeader";
 import SeriesSection from "@/components/organisms/SeriesSection";
 import { createStaticClient } from "@/lib/supabase/static";
 
@@ -68,8 +68,8 @@ export default async function LureDetailPage({
       {/* スクロール位置を0にリセット */}
       <ScrollReset />
 
-      <DetailPageHeader />
-      <main className="relative pt-[140px]">
+      <PageHeader />
+      <main className="relative pt-[160px]">
         {/* 画像セクション */}
         <LureDetailImage
           lureId={lure.lure_id}

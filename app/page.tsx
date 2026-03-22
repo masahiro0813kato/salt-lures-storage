@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import DetailPageHeader from "@/components/organisms/DetailPageHeader";
+import PageHeader from "@/components/organisms/PageHeader";
 import RankingSectionStatic from "@/components/organisms/RankingSectionStatic";
 
 // ISR: 1時間ごとに再生成
@@ -43,8 +43,8 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-bg-primary">
-      <DetailPageHeader />
-      <main className="pt-[170px] pb-20 md:pb-0">
+      <PageHeader />
+      <main className="pt-[200px] pb-20 md:pb-0">
         <div className="max-w-3xl mx-auto">
           <RankingSectionStatic title="月間閲覧ランキング" rankings={monthlyRankings} period="monthly" />
           <RankingSectionStatic title="年間閲覧ランキング" rankings={yearlyRankings} period="yearly" />

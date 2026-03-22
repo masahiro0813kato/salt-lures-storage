@@ -254,8 +254,8 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
       {isShow && (
         <section
           ref={suggestListRef}
-          className="w-full bg-bg-primary absolute transition-opacity duration-200 overflow-y-auto pointer-events-auto z-[1500]"
-          style={{ height: "calc(100vh - 144px - 64px)" }}
+          className="w-full bg-bg-primary absolute transition-opacity duration-200 overflow-y-auto pointer-events-auto z-[1500] pb-4"
+          style={{ height: "calc(100vh - 160px - 64px)" }}
         >
           {hasInput ? (
             /* キーワード入力中: サジェスト表示 */
