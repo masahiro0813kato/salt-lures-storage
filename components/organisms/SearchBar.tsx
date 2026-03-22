@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useStickyHeader } from "./StickyHeader";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
+import { sendGAEvent } from "@/lib/ga";
 
 interface SuggestLure {
   id: number;
@@ -106,6 +107,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
     inputRef.current?.blur();
     if (value.trim()) {
       addHistory(value.trim());
+      sendGAEvent('search_lure', { search_term: value.trim() });
     }
     router.push(`/lures?search=${value}`);
   }, [router, addHistory]);
@@ -116,6 +118,7 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
     if (inputRef.current) inputRef.current.value = keyword;
     inputRef.current?.blur();
     addHistory(keyword);
+    sendGAEvent('use_search_history', { search_term: keyword });
     router.push(`/lures?search=${keyword}`);
   }, [router, addHistory]);
 
@@ -180,9 +183,13 @@ export default function SearchBar({ latestSearchKey = "" }: SearchBarProps) {
   }, [searchLures, updateFromInput]);
 
   const handleClear = () => {
+    const previousTerm = inputRef.current?.value || "";
     setSearchKey("");
     setSuggestLures([]);
     if (inputRef.current) inputRef.current.value = "";
+    if (previousTerm) {
+      sendGAEvent('clear_search', { previous_term: previousTerm });
+    }
     router.push("/lures");
   };
 

@@ -46,8 +46,8 @@ export default async function Home() {
       <DetailPageHeader />
       <main className="pt-[170px] pb-20 md:pb-0">
         <div className="max-w-3xl mx-auto">
-          <RankingSectionStatic title="月間閲覧ランキング" rankings={monthlyRankings} />
-          <RankingSectionStatic title="年間閲覧ランキング" rankings={yearlyRankings} />
+          <RankingSectionStatic title="月間閲覧ランキング" rankings={monthlyRankings} period="monthly" />
+          <RankingSectionStatic title="年間閲覧ランキング" rankings={yearlyRankings} period="yearly" />
         </div>
       </main>
     </div>

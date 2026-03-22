@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { sendGAEvent } from "@/lib/ga";
 
 interface RankingCardProps {
   rank: number;
@@ -13,6 +14,7 @@ interface RankingCardProps {
   lureImageId: string;
   viewCount: number;
   priority?: boolean;
+  period?: string;
 }
 
 export default function RankingCard({
@@ -24,6 +26,7 @@ export default function RankingCard({
   lureImageId,
   viewCount,
   priority = false,
+  period = "",
 }: RankingCardProps) {
   const originalImageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lureImageId}_thumb.png`;
   const defaultImageUrl = "/images/common/lure_tmb_default.webp";
@@ -32,6 +35,15 @@ export default function RankingCard({
   return (
     <Link
       href={`/lures/${lureId}-${urlCode}`}
+      onClick={() => {
+        if (rank > 0) {
+          sendGAEvent('click_ranking', {
+            lure_name: lureName,
+            rank,
+            period,
+          });
+        }
+      }}
       className="block min-w-[160px] w-[160px] rounded-lg bg-white hover:scale-105 transition-transform duration-200"
     >
       {/* 画像エリア */}

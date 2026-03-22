@@ -1,13 +1,8 @@
 import { useEffect } from 'react';
+import { sendGAEvent } from '@/lib/ga';
 
 // セッション内の重複送信を防ぐ
 const trackedIds = new Set<number>();
-
-declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void;
-  }
-}
 
 interface UseTrackViewOptions {
   lureName?: string;
@@ -28,12 +23,10 @@ export function useTrackView(lureId: number | undefined, options?: UseTrackViewO
     }).catch(() => {});
 
     // GA4カスタムイベント送信
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'view_lure', {
-        lure_id: lureId,
-        lure_name: options?.lureName || '',
-        maker_name: options?.makerName || '',
-      });
-    }
+    sendGAEvent('view_lure', {
+      lure_id: lureId,
+      lure_name: options?.lureName || '',
+      maker_name: options?.makerName || '',
+    });
   }, [lureId, options?.lureName, options?.makerName]);
 }

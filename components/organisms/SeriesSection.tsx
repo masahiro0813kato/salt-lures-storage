@@ -3,19 +3,23 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { sendGAEvent } from "@/lib/ga";
 import type { LureWithRelations } from "@/types/database";
 
 interface SeriesSectionProps {
   seriesName: string;
   currentLureId: number;
+  currentLureName?: string;
   onSelectLure?: (lure: LureWithRelations) => void;
 }
 
 function SeriesCard({
   lure,
+  fromLureName,
   onSelectLure,
 }: {
   lure: LureWithRelations;
+  fromLureName: string;
   onSelectLure?: (lure: LureWithRelations) => void;
 }) {
   const originalImageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/thumbnails/${lure.lure_id}_thumb.png`;
@@ -49,21 +53,23 @@ function SeriesCard({
   );
 
   if (onSelectLure) {
+    const handleClick = () => {
+      sendGAEvent('click_series', { from_lure: fromLureName, to_lure: lure.lure_name_ja });
+      onSelectLure(lure);
+    };
+
     return (
-      <div
-        className="cursor-pointer"
-        onClick={(e) => {
-          e.preventDefault();
-          onSelectLure(lure);
-        }}
-      >
+      <div className="cursor-pointer" onClick={handleClick}>
         {cardContent}
       </div>
     );
   }
 
   return (
-    <Link href={`/lures/${lure.id}-${lure.url_code}`}>
+    <Link
+      href={`/lures/${lure.id}-${lure.url_code}`}
+      onClick={() => sendGAEvent('click_series', { from_lure: fromLureName, to_lure: lure.lure_name_ja })}
+    >
       {cardContent}
     </Link>
   );
@@ -72,6 +78,7 @@ function SeriesCard({
 export default function SeriesSection({
   seriesName,
   currentLureId,
+  currentLureName = "",
   onSelectLure,
 }: SeriesSectionProps) {
   const [lures, setLures] = useState<LureWithRelations[]>([]);
@@ -108,6 +115,7 @@ export default function SeriesSection({
           <SeriesCard
             key={lure.id}
             lure={lure}
+            fromLureName={currentLureName}
             onSelectLure={onSelectLure}
           />
         ))}

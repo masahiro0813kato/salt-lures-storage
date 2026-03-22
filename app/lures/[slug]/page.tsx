@@ -199,6 +199,7 @@ export default async function LureDetailPage({
             <SeriesSection
               seriesName={lure.lure_series_ja}
               currentLureId={lure.id}
+              currentLureName={lure.lure_name_ja}
             />
           )}
         </section>

@@ -139,6 +139,7 @@ function HorizontalLayout({ lure, onSelectLure }: { lure: LureWithRelations; onS
           <SeriesSection
             seriesName={lure.lure_series_ja}
             currentLureId={lure.id}
+            currentLureName={lure.lure_name_ja}
             onSelectLure={onSelectLure}
           />
         )}
@@ -180,6 +181,7 @@ function VerticalLayout({ lure, onSelectLure }: { lure: LureWithRelations; onSel
           <SeriesSection
             seriesName={lure.lure_series_ja}
             currentLureId={lure.id}
+            currentLureName={lure.lure_name_ja}
             onSelectLure={onSelectLure}
           />
         )}

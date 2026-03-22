@@ -14,9 +14,10 @@ interface RankingItem {
 interface RankingSectionStaticProps {
   title: string;
   rankings: RankingItem[];
+  period: string;
 }
 
-export default function RankingSectionStatic({ title, rankings }: RankingSectionStaticProps) {
+export default function RankingSectionStatic({ title, rankings, period }: RankingSectionStaticProps) {
   return (
     <section className="mb-8">
       <h2 className="text-lg font-bold text-white px-4 mb-4">{title}</h2>
@@ -40,6 +41,7 @@ export default function RankingSectionStatic({ title, rankings }: RankingSection
               lureImageId={item.lure_image_id}
               viewCount={item.view_count}
               priority={index < 3}
+              period={period}
             />
           ))}
         </div>
