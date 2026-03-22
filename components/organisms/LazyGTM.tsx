@@ -4,6 +4,9 @@ import { useEffect } from "react";
 
 export default function LazyGTM({ gtmId }: { gtmId: string }) {
   useEffect(() => {
+    // 管理画面ではGTMを読み込まない
+    if (window.location.pathname.startsWith("/admin")) return;
+
     // ページ表示完了後にGTMを遅延読み込み
     const timer = setTimeout(() => {
       // dataLayer初期化
