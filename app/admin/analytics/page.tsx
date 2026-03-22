@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import DailyViewsChart from "@/components/admin/DailyViewsChart";
+import BreakdownTables from "@/components/admin/BreakdownTables";
 
 interface RankingItem {
   rank: number;
@@ -76,6 +77,9 @@ export default function AdminAnalyticsPage() {
 
       {/* 閲覧数推移グラフ */}
       <DailyViewsChart />
+
+      {/* メーカー別・シリーズ別集計 */}
+      <BreakdownTables />
 
       {/* 期間切替・表示件数 */}
       <div className="flex flex-wrap items-center gap-4 mb-4">
