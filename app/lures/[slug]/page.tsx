@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import LureDetailImage from "@/components/organisms/LureDetailImage";
 import ScrollReset from "@/components/organisms/ScrollReset";
 import { parseLureUrl } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/server";
 import ViewTracker from "@/components/organisms/ViewTracker";
 import DetailPageHeader from "@/components/organisms/DetailPageHeader";
 import SeriesSection from "@/components/organisms/SeriesSection";
@@ -42,7 +41,7 @@ export default async function LureDetailPage({
   if (!parsed) notFound();
 
   // Supabaseからデータ取得
-  const supabase = await createClient();
+  const supabase = createStaticClient();
   const { data: lure, error } = await supabase
     .from("lures")
     .select(
@@ -218,7 +217,7 @@ export async function generateMetadata({
   if (!parsed) return {};
 
   // Supabaseからデータ取得
-  const supabase = await createClient();
+  const supabase = createStaticClient();
   const { data: lure } = await supabase
     .from("lures")
     .select(
@@ -237,9 +236,21 @@ export async function generateMetadata({
   const pageUrl = `${siteUrl}/lures/${parsed.id}-${parsed.code}`;
   const imageUrl = `https://acnvuvzuswsyrbczxzko.supabase.co/storage/v1/object/public/lure-images/lures/main/${lure.lure_id}_main.png`;
 
+  // スペック情報をdescriptionに含める
+  const specs: string[] = [];
+  const hookSizes = [lure.attached_hook_size_1, lure.attached_hook_size_2, lure.attached_hook_size_3, lure.attached_hook_size_4, lure.attached_hook_size_5].filter(Boolean);
+  if (hookSizes.length > 0) specs.push(`フックサイズ:${hookSizes.join('・')}`);
+  if (lure.attached_ring_size) specs.push(`リングサイズ:${lure.attached_ring_size}`);
+  if (lure.lure_length) specs.push(`長さ:${lure.lure_length}mm`);
+  if (lure.lure_weight) specs.push(`重さ:${lure.lure_weight}g`);
+  const specText = specs.join(' ');
+  const description = specText
+    ? `${specText}。${lure.lure_information || ""}`
+    : lure.lure_information || "";
+
   return {
     title: lure.lure_name_ja,
-    description: lure.lure_information || "",
+    description,
     keywords: [
       lure.lure_name_ja,
       lure.lure_maker?.lure_maker_name_ja || "",
@@ -248,8 +259,8 @@ export async function generateMetadata({
       "釣り",
     ],
     openGraph: {
-      title: `${lure.lure_name_ja} | Salt Lure Storage`,
-      description: lure.lure_information || "",
+      title: `${lure.lure_name_ja} | SLS - Salt Lure Storage`,
+      description,
       url: pageUrl,
       type: "article",
       locale: "ja_JP",
@@ -265,8 +276,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${lure.lure_name_ja} | Salt Lure Storage`,
-      description: lure.lure_information || "",
+      title: `${lure.lure_name_ja} | SLS - Salt Lure Storage`,
+      description,
       images: [imageUrl],
     },
     alternates: {

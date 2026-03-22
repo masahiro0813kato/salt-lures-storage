@@ -9,11 +9,11 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://salt-lure-storage.c
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Salt Lure Storage - ソルトルアーデータベース",
-    template: "%s | Salt Lure Storage",
+    default: "SLS - Salt Lure Storage | ルアーのフックサイズがすぐわかる",
+    template: "%s | SLS - Salt Lure Storage",
   },
   description:
-    "釣具メーカーの公式サイトから製品情報を自動収集し、統一されたデータベースとして提供する",
+    "フック交換のときフックサイズがわからない、探すのが大変。シーバス用ソルトルアーのフックサイズ・リングサイズ・スペックをメーカー横断で検索できるデータベースサイトです。",
   verification: {
     google: "mPXec5_5rqm6q715I0yzarx6oRGaDDqc4LRsMpsDnKI",
   },
@@ -44,16 +44,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ja_JP",
     url: siteUrl,
-    title: "Salt Lure Storage - ソルトルアーデータベース",
+    title: "SLS - Salt Lure Storage | ルアーのフックサイズがすぐわかる",
     description:
-      "釣具メーカーの公式サイトから製品情報を自動収集し、統一されたデータベースとして提供する",
-    siteName: "Salt Lure Storage",
+      "フック交換のときフックサイズがわからない、探すのが大変。シーバス用ソルトルアーのフックサイズ・リングサイズ・スペックをメーカー横断で検索できるデータベースサイトです。",
+    siteName: "SLS - Salt Lure Storage",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Salt Lure Storage - ソルトルアーデータベース",
+    title: "SLS - Salt Lure Storage | ルアーのフックサイズがすぐわかる",
     description:
-      "釣具メーカーの公式サイトから製品情報を自動収集し、統一されたデータベースとして提供する",
+      "フック交換のときフックサイズがわからない、探すのが大変。シーバス用ソルトルアーのフックサイズ・リングサイズ・スペックをメーカー横断で検索できるデータベースサイトです。",
     creator: "@yourtwitterhandle",
   },
   alternates: {
@@ -68,10 +68,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <head>
-        <link rel="preconnect" href="https://acnvuvzuswsyrbczxzko.supabase.co" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://acnvuvzuswsyrbczxzko.supabase.co" />
-      </head>
       <body className="antialiased" suppressHydrationWarning>
         <LazyGTM gtmId="GTM-M2P73Z58" />
         <ReactQueryProvider>
