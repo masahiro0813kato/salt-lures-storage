@@ -9,6 +9,7 @@ interface LureDetailPanelProps {
   lure: LureWithRelations;
   horizontal?: boolean;
   onSelectLure?: (lure: LureWithRelations) => void;
+  trackView?: boolean;
 }
 
 function nl2br(text: string | null | undefined): string {
@@ -190,8 +191,8 @@ function VerticalLayout({ lure, onSelectLure }: { lure: LureWithRelations; onSel
   );
 }
 
-export default function LureDetailPanel({ lure, horizontal = false, onSelectLure }: LureDetailPanelProps) {
-  useTrackView(lure.id, {
+export default function LureDetailPanel({ lure, horizontal = false, onSelectLure, trackView = false }: LureDetailPanelProps) {
+  useTrackView(trackView ? lure.id : undefined, {
     lureName: lure.lure_name_ja,
     makerName: lure.lure_maker?.lure_maker_name_en || "",
   });
